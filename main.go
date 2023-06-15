@@ -10,7 +10,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-
 const secretKey = "jwxruguggkgghiihkg"
 
 var db *sql.DB
@@ -26,7 +25,9 @@ func main() {
 	}
 	defer database.DB.Close()
 
-	db = database.DB
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendFile("./public/home.html") // Serve the home.html file as the home page
+	})
 
 	app.Get("/register", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/register.html")

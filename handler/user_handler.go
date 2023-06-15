@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-    
+
 	"github.com/AKASHLM010/BLOG_PROJ/config"
 	"github.com/AKASHLM010/BLOG_PROJ/database"
 	"github.com/AKASHLM010/BLOG_PROJ/models"
@@ -24,8 +24,8 @@ func RegisterUser(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	query := "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id"
-	err = database.DB.QueryRow(query, user.Username, hashedPassword).Scan(&user.ID)
+	query := "INSERT INTO users (first_name, last_name, email, password, phone) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	err = database.DB.QueryRow(query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Phone).Scan(&user.ID)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
@@ -43,8 +43,9 @@ func AuthenticateUser(c *fiber.Ctx) error {
 	}
 
 	var storedPassword string
-	query := "SELECT id, password FROM users WHERE username = $1"
-	err = database.DB.QueryRow(query, user.Username).Scan(&user.ID, &storedPassword)
+	query := "SELECT id, password FROM users WHERE email = $1"
+	err = database.DB.QueryRow(query, user.Email).Scan(&user.ID, &storedPassword)
+
 	if err != nil {
 		return c.Status(http.StatusUnauthorized).SendString("Invalid username or password")
 	}
@@ -55,8 +56,8 @@ func AuthenticateUser(c *fiber.Ctx) error {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"userID":   user.ID,
+		"email":  user.Email,
+		"userID": user.ID,
 	})
 
 	tokenString, err := token.SignedString([]byte(config.SecretKey))
