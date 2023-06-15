@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -21,6 +22,23 @@ func RegisterUser(c *fiber.Ctx) error {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Check if email is already registered
+	var existingUser models.User
+	err = database.DB.QueryRow("SELECT id FROM users WHERE email = $1", user.Email).Scan(&existingUser.ID)
+	if err == nil {
+		return c.Status(http.StatusConflict).SendString("Email already registered")
+	} else if err != sql.ErrNoRows {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Check if phone number is already registered
+	err = database.DB.QueryRow("SELECT id FROM users WHERE phone = $1", user.Phone).Scan(&existingUser.ID)
+	if err == nil {
+		return c.Status(http.StatusConflict).SendString("Phone number already registered")
+	} else if err != sql.ErrNoRows {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
