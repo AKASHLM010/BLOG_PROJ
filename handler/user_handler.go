@@ -126,14 +126,14 @@ userID := int(userIDFloat)
 
 	// Retrieve the user's profile data from the database using the email or userID
 	var user models.User
-	query := "SELECT email FROM users WHERE email = $1 AND id = $2"
-	err = database.DB.QueryRow(query, email, userID).Scan(&user.Email)
+	query := "SELECT first_name FROM users WHERE email = $1 AND id = $2"
+	err = database.DB.QueryRow(query, email, userID).Scan(&user.FirstName)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
 	user.ID = userID
 
+	// Render the profile page with the user's data
 	return c.Render("public/profile.html", user)
- // Render the profile page with the user's data
 }
