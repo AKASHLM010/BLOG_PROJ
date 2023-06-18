@@ -10,8 +10,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const secretKey = "jwxruguggkgghiihkg"
-
 var db *sql.DB
 
 func main() {
@@ -37,6 +35,8 @@ func main() {
 	app.Get("/login", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/login.html")
 	})
+	app.Get("/profile", handler.UserProfile)
+
 	app.Get("/blogs", handler.GetAllBlogs)
 	app.Get("/blogs/:id", handler.GetBlogByID)
 	app.Post("/blogs", handler.CreateBlog)

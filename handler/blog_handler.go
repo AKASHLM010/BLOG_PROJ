@@ -109,5 +109,3 @@ func DeleteBlog(c *fiber.Ctx) error {
 
 	return c.SendStatus(http.StatusOK)
 }
-
-

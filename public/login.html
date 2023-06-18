@@ -19,7 +19,37 @@
         <p id="message"></p>
     </div>
     <p>Don't have an account? <a href="/register">Register</a></p>
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+    
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+    
+          // Make a fetch request to authenticate the user
+          fetch('/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email, password: password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Handle the authentication response, such as saving the JWT token
+              console.log(data);
+    
+              // Redirect to the profile page if authentication is successful
+              if (data.token) {
+                window.location.href = '/profile';
+              }
+            })
+            .catch((error) => {
+              // Handle any errors that occurred during the fetch request
+              console.error(error);
+            });
+        });
+      </script>
 </body>
 
 </html>
