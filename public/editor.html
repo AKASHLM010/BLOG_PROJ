@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blog Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Blog Editor</h2>
+  <form id="blogForm" action="/create-blog">
+    <div>
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" rows="5" required></textarea>
+    </div>
+    <button type="submit">Create Blog</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('blogForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+
+      // Perform an AJAX request or use fetch() to send the data to the server
+      // Replace '/create' with the appropriate URL for your server's create endpoint
+      const response = await fetch('/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, content })
+      });
+
+      if (response.ok) {
+        // Redirect to the view page or perform any other necessary action
+        alert('Blog created successfully!');
+      } else {
+        // Handle the error case
+        alert('Error creating the blog.');
+      }
+    });
+  </script>
+</body>
+</html>
