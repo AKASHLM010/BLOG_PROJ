@@ -97,3 +97,43 @@ func AuthenticateUser(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"token": tokenString})
 }
+
+func UserProfile(c *fiber.Ctx) error {
+	// Get the JWT token from the cookie
+	cookie := c.Cookies("jwt")
+
+	// Parse the JWT token
+	token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.SecretKey), nil
+	})
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString("Unauthorized")
+	}
+
+	// Extract user information from the JWT token claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return c.Status(http.StatusUnauthorized).SendString("Unauthorized")
+	}
+
+	// Retrieve user data based on the claims (email and userID)
+	email := claims["email"].(string)
+    userIDFloat, ok := claims["userID"].(float64)
+if !ok {
+    return c.Status(http.StatusInternalServerError).SendString("Invalid user ID")
+}
+userID := int(userIDFloat)
+
+	// Retrieve the user's profile data from the database using the email or userID
+	var user models.User
+	query := "SELECT email FROM users WHERE email = $1 AND id = $2"
+	err = database.DB.QueryRow(query, email, userID).Scan(&user.Email)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	user.ID = userID
+
+	return c.Render("public/profile.html", user)
+ // Render the profile page with the user's data
+}
