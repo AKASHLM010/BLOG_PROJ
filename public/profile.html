@@ -1,50 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profile</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 20px;
-    }
-
-    h2 {
-      color: #333;
-    }
-
-    p {
-      color: #666;
-      margin-bottom: 10px;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin-bottom: 5px;
-    }
-
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <title>User Profile</title>
 </head>
 <body>
-  <h2>Welcome, {{ .FirstName }}!</h2>
-  <p>What would you like to do?</p>
-  <ul>
-    <li><a href="/editor">Create a new blog</a></li>
-    <li><a href="/update">Update your vlogs</a></li>
-    <li><a href="/delete">Delete your vlogs</a></li>
-    <li><a href="/view">View your vlogs</a></li>
-  </ul>
+    <h1>User Profile</h1>
+    <h2>Welcome, {{ .User.FirstName }} {{ .User.LastName }}</h2>
+    <p>Email: {{ .User.Email }}</p>
+    <p>Phone: {{ .User.Phone }}</p>
+    
+    <h2>Your Blogs</h2>
+    {{ range .Blogs }}
+    <div>
+        <h3>{{ .Title }}</h3>
+        <p>Author: {{ .Author }}</p>
+        <p>Created At: {{ .CreatedAt }}</p>
+        <p>Updated At: {{ .UpdatedAt }}</p>
+        <p>{{ .Content }}</p>
+        <a href="/blogs/{{ .ID }}">View</a>
+        <a href="/blogs/{{ .ID }}/edit">Edit</a>
+        <a href="/blogs/{{ .ID }}/delete">Delete</a>
+    </div>
+    {{ end }}
+    
+    <h2>Create a New Blog</h2>
+    <form action="/blogs" method="post">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" required></textarea><br><br>
+        <input type="submit" value="Create Blog">
+    </form>
 </body>
 </html>
