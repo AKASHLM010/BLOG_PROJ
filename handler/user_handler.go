@@ -55,48 +55,49 @@ func RegisterUser(c *fiber.Ctx) error {
 }
 
 func AuthenticateUser(c *fiber.Ctx) error {
-	var user models.User
-	err := json.Unmarshal(c.Body(), &user)
-	if err != nil {
-		return c.Status(http.StatusBadRequest).SendString(err.Error())
-	}
+    var user models.User
+    err := json.Unmarshal(c.Body(), &user)
+    if err != nil {
+        return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	var storedPassword string
-	query := "SELECT id, password FROM users WHERE email = $1"
-	err = database.DB.QueryRow(query, user.Email).Scan(&user.ID, &storedPassword)
+    var storedPassword string
+    query := "SELECT id, password FROM users WHERE email = $1"
+    err = database.DB.QueryRow(query, user.Email).Scan(&user.ID, &storedPassword)
 
-	if err != nil {
-		return c.Status(http.StatusUnauthorized).SendString("Invalid username or password")
-	}
+    if err != nil {
+        return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid Email or Password"})
+    }
 
-	err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(user.Password))
-	if err != nil {
-		return c.Status(http.StatusUnauthorized).SendString("Invalid username or password")
-	}
+    err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(user.Password))
+    if err != nil {
+        return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid Email or Password"})
+    }
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":  user.Email,
-		"userID": user.ID,
-	})
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "email":  user.Email,
+        "userID": user.ID,
+    })
 
-	tokenString, err := token.SignedString([]byte(config.SecretKey))
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
+    tokenString, err := token.SignedString([]byte(config.SecretKey))
+    if err != nil {
+        return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+    }
 
-	// Set the JWT token as a cookie
-	cookie := fiber.Cookie{
-		Name:     "jwt",
-		Value:    tokenString,
-		Expires:  time.Now().Add(time.Hour * 24), // Set the cookie expiration time
-		HTTPOnly: true,                           // Ensure the cookie is not accessible via JavaScript
-		Secure:   true,                           // Set the cookie to be secure (HTTPS only)
-		SameSite: "Strict",                       // Set the SameSite attribute to Strict
-	}
-	c.Cookie(&cookie)
+    // Set the JWT token as a cookie
+    cookie := fiber.Cookie{
+        Name:     "jwt",
+        Value:    tokenString,
+        Expires:  time.Now().Add(time.Hour * 24), // Set the cookie expiration time
+        HTTPOnly: true,                           // Ensure the cookie is not accessible via JavaScript
+        Secure:   true,                           // Set the cookie to be secure (HTTPS only)
+        SameSite: "Strict",                       // Set the SameSite attribute to Strict
+    }
+    c.Cookie(&cookie)
 
-	return c.JSON(fiber.Map{"token": tokenString})
+    return c.JSON(fiber.Map{"token": tokenString})
 }
+
 
 func UserProfile(c *fiber.Ctx) error {
 	// Get the JWT token from the cookie
@@ -126,14 +127,14 @@ userID := int(userIDFloat)
 
 	// Retrieve the user's profile data from the database using the email or userID
 	var user models.User
-	query := "SELECT email FROM users WHERE email = $1 AND id = $2"
-	err = database.DB.QueryRow(query, email, userID).Scan(&user.Email)
+	query := "SELECT first_name FROM users WHERE email = $1 AND id = $2"
+	err = database.DB.QueryRow(query, email, userID).Scan(&user.FirstName)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
 	user.ID = userID
 
+	
 	return c.Render("public/profile.html", user)
- // Render the profile page with the user's data
 }
