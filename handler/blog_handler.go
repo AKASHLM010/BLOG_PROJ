@@ -298,3 +298,32 @@ func GetBlogForEdit(c *fiber.Ctx) error {
 	// Render the edit.html page with the data
 	return c.Render("public/edit.html", data)
 }
+
+func GetBlogsForEdit(c *fiber.Ctx) error {
+	// Retrieve the logged-in user's ID
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Retrieve the user's blogs from the database using the user's ID
+	blogs, err := GetUserBlogs(userID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Create a data structure to hold the blog IDs
+	data := struct {
+		BlogIDs []int
+	}{
+		BlogIDs: make([]int, len(blogs)),
+	}
+
+	// Extract the blog IDs from the retrieved blogs
+	for i, blog := range blogs {
+		data.BlogIDs[i] = blog.ID
+	}
+
+	// Render the editblogs.html page with the data
+	return c.Render("public/editblogs.html", data)
+}

@@ -42,9 +42,7 @@
   <p>What would you like to do?</p>
   <ul>
     <li><a href="/editor">Create a new blog</a></li>
-    {{ range .BlogIDs }}
-    <li><a href="/edit/{{ . }}">Update blog ID: {{ . }}</a></li>
-    {{ end }}
+    <li><a href="/edit">Update your blogs</a></li>
     <li><a href="/delete">Delete your blogs</a></li>
     <li><a href="/blogs">View your blogs</a></li>
   </ul>

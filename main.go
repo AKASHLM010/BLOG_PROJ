@@ -43,6 +43,8 @@ func main() {
 		return c.SendFile("./public/editor.html")
 	})
 	app.Post("/editor", handler.CreateBlog)
+	app.Get("/edit", handler.GetBlogsForEdit)
+
 	app.Get("/edit/:id", handler.GetBlogForEdit)
 
 	app.Put("/edit/:id", handler.UpdateBlog)

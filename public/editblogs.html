@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Blogs</title>
+</head>
+<body>
+    <h1>Edit Blogs</h1>
+
+    <ul>
+        {{ range .BlogIDs }}
+        <li><a href="/edit/{{ . }}">Update blog ID: {{ . }}</a></li>
+        {{ end }}
+    </ul>
+</body>
+</html>
