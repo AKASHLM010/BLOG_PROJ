@@ -78,19 +78,7 @@ func CreateBlog(c *fiber.Ctx) error {
 	return c.JSON(blog)
 }
 
-func DeleteBlog(c *fiber.Ctx) error {
-	id, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return c.Status(http.StatusBadRequest).SendString(err.Error())
-	}
 
-	_, err = database.DB.Exec("DELETE FROM blogs WHERE id = $1", id)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	return c.SendStatus(http.StatusOK)
-}
 
 // getUserDetails retrieves the concatenated first name and last name of the logged-in user
 func getUserDetails(c *fiber.Ctx) (string, error) {
@@ -326,4 +314,62 @@ func GetBlogsForEdit(c *fiber.Ctx) error {
 
 	// Render the editblogs.html page with the data
 	return c.Render("public/editblogs.html", data)
+}
+
+func GetBlogsForDelete(c *fiber.Ctx) error {
+	// Retrieve the logged-in user's ID
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Retrieve the user's blogs from the database using the user's ID
+	blogs, err := GetUserBlogs(userID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Create a data structure to hold the blog IDs
+	data := struct {
+		BlogIDs []int
+	}{
+		BlogIDs: make([]int, len(blogs)),
+	}
+
+	// Extract the blog IDs from the retrieved blogs
+	for i, blog := range blogs {
+		data.BlogIDs[i] = blog.ID
+	}
+	
+	// Render the deleteblogs.html page with the blogs data
+	return c.Render("public/deleteblogs.html", data)
+}
+
+func DeleteBlog(c *fiber.Ctx) error {
+	// Retrieve the logged-in user's ID
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Extract the blog ID from the request parameters
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(http.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Delete the blog from the database using the blog ID and the logged-in user's ID
+	err = deleteBlogByIDAndUserID(id, userID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Redirect to the delete page to show the updated list of blogs
+	return c.Redirect("/delete")
+}
+
+func deleteBlogByIDAndUserID(id, userID int) error {
+	// Perform the deletion operation on the database
+	_, err := database.DB.Exec("DELETE FROM blogs WHERE id = $1 AND user_id = $2", id, userID)
+	return err
 }

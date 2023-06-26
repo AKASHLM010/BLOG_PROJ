@@ -48,7 +48,9 @@ func main() {
 	app.Get("/edit/:id", handler.GetBlogForEdit)
 
 	app.Put("/edit/:id", handler.UpdateBlog)
-	
+	app.Get("/delete", handler.GetBlogsForDelete)
+    app.Post("/delete/:id", handler.DeleteBlog)
+
 
 
 

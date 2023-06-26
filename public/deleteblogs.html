@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Blogs</title>
+</head>
+<body>
+    <h1>Delete Blogs</h1>
+
+    <ul>
+        {{ range .BlogIDs }}
+        <li>
+            <a href="/delete/{{ . }}">Delete Blog ID: {{ . }}</a>
+            <form method="POST" action="/delete/{{ . }}">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+        {{ end }}
+    </ul>
+</body>
+</html>
