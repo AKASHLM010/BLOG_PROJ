@@ -9,4 +9,5 @@ type Blog struct {
 	Author    string    `json:"author"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	UserID    int       `json:"user_id"`
 }

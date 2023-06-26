@@ -13,10 +13,9 @@ func ConnectToDB() error {
 	// Connection parameters
 	dbHost := "localhost"
 	dbPort := 5432
-	dbUser     := "postgres"
+	dbUser := "postgres"
 	dbPassword := "723101"
-	dbName     := "blogb"
-	
+	dbName := "blogb"
 
 	// Construct the connection string
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)

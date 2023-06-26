@@ -38,13 +38,18 @@ func main() {
 	app.Get("/profile", handler.UserProfile)
 
 	app.Get("/blogs", handler.GetAllBlogs)
-	app.Get("/blogs/:id", handler.GetBlogByID)
+
 	app.Get("/editor", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/editor.html")
 	})
-	app.Post("/blogs", handler.CreateBlog)
-	app.Put("/blogs/:id", handler.UpdateBlog)
-	app.Delete("/blogs/:id", handler.DeleteBlog)
+	app.Post("/editor", handler.CreateBlog)
+	app.Get("/edit/:id", handler.GetBlogForEdit)
+
+	app.Put("/edit/:id", handler.UpdateBlog)
+	
+
+
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Server is running")
 	})
