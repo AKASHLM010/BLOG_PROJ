@@ -13,7 +13,7 @@ This is a simple Golang blog website built using the Go programming language and
 
 ## Prerequisites
 
-- Go (version X.X.X)
-- PostgreSQL (version X.X.X)
+- Go 
+- PostgreSQL 
 
 ## Getting Started yo hO YO HOOOO..... 
