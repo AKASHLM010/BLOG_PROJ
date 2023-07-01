@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blog</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+
+    .blog-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .blog-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .blog-content {
+      font-size: 16px;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="blog-container">
+    <h2 class="blog-title">{{ .blog.Title }}</h2>
+    <div class="blog-content">{{ .blog.Content }}</div>
+    <!-- Add more HTML and placeholders as needed -->
+  </div>
+</body>
+</html>

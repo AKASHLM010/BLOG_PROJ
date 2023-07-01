@@ -245,6 +245,7 @@ func GetUserBlogs(userID int) ([]models.Blog, error) {
 		blogs = append(blogs, blog)
 	}
 
+
 	return blogs, nil
 }
 
@@ -373,3 +374,64 @@ func deleteBlogByIDAndUserID(id, userID int) error {
 	_, err := database.DB.Exec("DELETE FROM blogs WHERE id = $1 AND user_id = $2", id, userID)
 	return err
 }
+
+func GetUserBlogsByUserID(c *fiber.Ctx) error {
+	userID, err := getUserID(c)
+	if err != nil {
+		// Handle the error, such as returning an error response
+		return err
+	}
+
+	blogs, err := GetUserBlogs(userID)
+	if err != nil {
+		// Handle the error, such as returning an error response
+		return err
+	}
+
+	// Render the blogs template with the retrieved blogs data and return the result
+	return c.Render("public/blogs.html", fiber.Map{
+		"blogs": blogs,
+	})
+}
+
+
+func ViewBlog(c *fiber.Ctx) error {
+	blogID := c.Params("id")
+
+	blog, err := GetBlogByID(blogID)
+	if err != nil {
+		// Handle the error, such as returning an error response or redirecting to an error page
+		return err
+	}
+
+	// Render the blog template with the retrieved blog data and return the result
+	return c.Render("public/blogpage.html", fiber.Map{
+		"blog": blog,
+	})
+}
+
+
+
+
+func GetBlogByID(blogID string) (*models.Blog, error) {
+	// Perform a database query to fetch the blog by its ID
+	query := "SELECT id, title, content FROM blogs WHERE id = $1"
+	row := database.DB.QueryRow(query, blogID)
+
+	// Create a new Blog struct to hold the retrieved blog data
+	blog := &models.Blog{}
+
+	// Scan the row's values into the blog struct
+	err := row.Scan(&blog.ID, &blog.Title, &blog.Content)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Handle the case where the blog doesn't exist
+			return nil, errors.New("blog not found")
+		}
+		// Handle any other database query error
+		return nil, err
+	}
+
+	return blog, nil
+}
+

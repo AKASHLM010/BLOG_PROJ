@@ -38,12 +38,15 @@ func main() {
 	app.Get("/profile", handler.UserProfile)
 
 	app.Get("/blogs", handler.GetAllBlogs)
+	app.Get("/view", handler.GetUserBlogsByUserID)
+
 
 	app.Get("/editor", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/editor.html")
 	})
 	app.Post("/editor", handler.CreateBlog)
 	app.Get("/edit", handler.GetBlogsForEdit)
+    app.Get("/blogs/:id", handler.ViewBlog)
 
 	app.Get("/edit/:id", handler.GetBlogForEdit)
 
