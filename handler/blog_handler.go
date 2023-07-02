@@ -376,23 +376,36 @@ func deleteBlogByIDAndUserID(id, userID int) error {
 }
 
 func GetUserBlogsByUserID(c *fiber.Ctx) error {
-	userID, err := getUserID(c)
-	if err != nil {
-		// Handle the error, such as returning an error response
-		return err
-	}
+    userID, err := getUserID(c)
+    if err != nil {
+        // Handle the error, such as returning an error response
+        return err
+    }
 
-	blogs, err := GetUserBlogs(userID)
-	if err != nil {
-		// Handle the error, such as returning an error response
-		return err
-	}
+    blogs, err := GetUserBlogs(userID)
+    if err != nil {
+        // Handle the error, such as returning an error response
+        return err
+    }
 
-	// Render the blogs template with the retrieved blogs data and return the result
-	return c.Render("public/blogs.html", fiber.Map{
-		"blogs": blogs,
-	})
+    blogData := make([]map[string]interface{}, len(blogs))
+    for i, blog := range blogs {
+        blogMap := map[string]interface{}{
+            "ID":      blog.ID,
+            "Title":   blog.Title,
+            "Content": blog.Content,
+        }
+        blogData[i] = blogMap
+    }
+
+    // Render the blogs template with the retrieved blogs data and return the result
+    return c.Render("public/blogs.html", fiber.Map{
+        "blogs": blogData,
+    })
 }
+
+
+
 
 
 func ViewBlog(c *fiber.Ctx) error {
@@ -415,14 +428,14 @@ func ViewBlog(c *fiber.Ctx) error {
 
 func GetBlogByID(blogID string) (*models.Blog, error) {
 	// Perform a database query to fetch the blog by its ID
-	query := "SELECT id, title, content FROM blogs WHERE id = $1"
+	query := "SELECT id, title, content, author FROM blogs WHERE id = $1"
 	row := database.DB.QueryRow(query, blogID)
 
 	// Create a new Blog struct to hold the retrieved blog data
 	blog := &models.Blog{}
 
 	// Scan the row's values into the blog struct
-	err := row.Scan(&blog.ID, &blog.Title, &blog.Content)
+	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where the blog doesn't exist

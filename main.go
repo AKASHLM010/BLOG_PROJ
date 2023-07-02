@@ -38,7 +38,10 @@ func main() {
 	app.Get("/profile", handler.UserProfile)
 
 	app.Get("/blogs", handler.GetAllBlogs)
-	app.Get("/view", handler.GetUserBlogsByUserID)
+	app.Get("/view", func(c *fiber.Ctx) error {
+		return handler.GetUserBlogsByUserID(c)
+	})
+	
 
 
 	app.Get("/editor", func(c *fiber.Ctx) error {

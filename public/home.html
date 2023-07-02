@@ -95,8 +95,8 @@
           const blogItem = document.createElement("div");
           blogItem.className = "blog-item";
           blogItem.innerHTML = `
-            <h2>${blog.title}</h2>
-            <p>${blog.content}</p>
+          <h2><a href="/blogs/${blog.id}">${blog.title}</a></h2>
+          
             <p>Author: ${blog.author}</p>
             <p>Created At: ${blog.created_at}</p>
             <p>Updated At: ${blog.updated_at}</p>
