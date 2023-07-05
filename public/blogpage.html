@@ -1,42 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blog</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 20px;
-    }
+    <title>Blog Page</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
 
-    .blog-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+        h1 {
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
 
-    .blog-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
+        #blogContent {
+            margin-bottom: 20px;
+        }
 
-    .blog-content {
-      font-size: 16px;
-      text-align: left;
-      margin-bottom: 10px;
-    }
-  </style>
+        p {
+            margin-bottom: 5px;
+        }
+
+        #blogAuthor {
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-  <div class="blog-container">
-    <h2 class="blog-title">{{ .blog.Title }}</h2>
-    <h3>Author :- {{ .blog.Author }}</h3>
-    <div class="blog-content">{{ .blog.Content }}</div>
-  </div>
+    <h1 id="blogTitle"></h1>
+    <p id="blogContent"></p>
+    <p id="blogAuthor"></p>
+    <p id="blogCreatedAt"></p>
+    <p id="blogUpdatedAt"></p>
+
+    <script>
+        // Function to parse query parameters from the URL
+        function getQueryParams(url) {
+            const queryParams = {};
+            const params = new URLSearchParams(url.search);
+            for (const [key, value] of params.entries()) {
+                queryParams[key] = value;
+            }
+            return queryParams;
+        }
+
+        // Get the blog data from the query parameters
+        const queryParams = getQueryParams(window.location);
+        const title = decodeURIComponent(queryParams.title);
+        const content = decodeURIComponent(queryParams.content);
+        const author = decodeURIComponent(queryParams.author);
+        const createdAt = new Date(queryParams.createdAt).toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        });
+        const updatedAt = new Date(queryParams.updatedAt).toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        });
+        // Update the content of the page with the blog data
+        document.getElementById('blogTitle').innerText = title;
+        document.getElementById('blogContent').innerText = content;
+        document.getElementById('blogAuthor').innerText = 'Author: ' + author;
+        document.getElementById('blogCreatedAt').innerText = 'Created At: ' + createdAt;
+        document.getElementById('blogUpdatedAt').innerText = 'Updated At: ' + updatedAt;
+    </script>
 </body>
 </html>

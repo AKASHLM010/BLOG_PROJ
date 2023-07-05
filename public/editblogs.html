@@ -2,14 +2,135 @@
 <html>
 <head>
     <title>Edit Blogs</title>
+    <style>
+        .blog-box {
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .blog-box a {
+            text-decoration: none;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <h1>Edit Blogs</h1>
+    <div id="blogs"></div>
 
-    <ul>
-        {{ range .BlogIDs }}
-        <li><a href="/edit/{{ . }}">Update blog ID: {{ . }}</a></li>
-        {{ end }}
-    </ul>
+    <script>
+        // Helper function to format time as "year-month-day, time"
+        function formatTime(timeString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+            return new Date(timeString).toLocaleString(undefined, options);
+        }
+
+        // Function to fetch the blog data for editing
+        function fetchBlogForEdit(id) {
+            fetch(`/edit/${id}`)
+                .then(response => response.json())
+                .then(blog => {
+                    // Create the form element dynamically
+                    const form = document.createElement('form');
+                    form.method = 'PUT';
+
+                    // Add input fields and submit button to the form
+                    const titleLabel = document.createElement('label');
+                    titleLabel.textContent = 'Title: ';
+                    const titleInput = document.createElement('input');
+                    titleInput.type = 'text';
+                    titleInput.name = 'title';
+                    titleInput.value = blog.title;
+                    titleInput.required = true;
+                    const contentLabel = document.createElement('label');
+                    contentLabel.textContent = 'Content: ';
+                    const contentInput = document.createElement('textarea');
+                    contentInput.name = 'content';
+                    contentInput.rows = 5;
+                    contentInput.value = blog.content;
+                    contentInput.required = true;
+                    const submitButton = document.createElement('input');
+                    submitButton.type = 'submit';
+                    submitButton.value = 'Save';
+
+                    // Append the form elements to the form
+                    form.appendChild(titleLabel);
+                    form.appendChild(titleInput);
+                    form.appendChild(document.createElement('br'));
+                    form.appendChild(contentLabel);
+                    form.appendChild(contentInput);
+                    form.appendChild(document.createElement('br'));
+                    form.appendChild(submitButton);
+
+                    // Replace the blog box content with the form
+                    const blogBox = document.getElementById(`blog-${id}`);
+                    blogBox.innerHTML = '';
+                    blogBox.appendChild(form);
+
+                    // Add event listener to the form
+                    form.addEventListener('submit', event => handleFormSubmit(event, id));
+                })
+                .catch(error => console.error(error));
+        }
+
+        // Function to handle the form submission and update the blog
+        function handleFormSubmit(event, id) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            const updatedTitle = formData.get('title');
+            const updatedContent = formData.get('content');
+
+            // Update the form's action URL with the updated title and content
+            form.action = `/edit/${id}?title=${encodeURIComponent(updatedTitle)}&content=${encodeURIComponent(updatedContent)}`;
+
+            fetch(form.action, {
+                method: 'PUT',
+                body: formData,
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Show success message
+                        showSuccessMessage();
+
+                        // Fetch the updated blog data and re-render the form
+                        fetchBlogForEdit(id);
+                    } else {
+                        console.error('Error updating blog');
+                    }
+                })
+                .catch(error => console.error(error));
+        }
+
+ // Function to show success message and refresh the page
+ function showSuccessMessage() {
+            alert('Blog updated successfully');
+            window.location.reload(); // Refresh the page
+        }
+
+
+        fetch('/edit')
+            .then(response => response.json())
+            .then(data => {
+                const blogsContainer = document.getElementById('blogs');
+
+                data.forEach(blog => {
+                    const blogElement = document.createElement('div');
+                    blogElement.id = `blog-${blog.id}`;
+                    blogElement.classList.add('blog-box');
+                    blogElement.innerHTML = `
+                        <h2><a href="/blogs/${blog.id}">${blog.title}</a></h2>
+                        <p>${blog.content.substring(0, 100)}...</p>
+                        <button onclick="fetchBlogForEdit(${blog.id})">Edit</button>
+                    `;
+                    blogsContainer.appendChild(blogElement);
+                });
+            })
+            .catch(error => console.error(error));
+    </script>
 </body>
 </html>

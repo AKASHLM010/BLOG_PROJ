@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Delete Blogs</title>
+    <title>View Blogs</title>
     <style>
         .blog-box {
             background-color: #f2f2f2;
@@ -9,7 +9,7 @@
             padding: 10px;
             margin-bottom: 10px;
         }
-
+  
         .blog-box a {
             text-decoration: none;
             color: #333;
@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <h1>Delete Blogs</h1>
+    <h1>View Blogs</h1>
     <div id="blogs"></div>
 
     <script>
@@ -27,23 +27,7 @@
             return new Date(timeString).toLocaleString(undefined, options);
         }
 
-        // Function to delete a blog
-        function deleteBlog(id) {
-            fetch(`/delete/${id}`, {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Refresh the page to update the list of blogs
-                    location.reload();
-                } else {
-                    console.error(`Error deleting blog with ID ${id}`);
-                }
-            })
-            .catch(error => console.error(error));
-        }
-
-        fetch('/delete')
+        fetch('/view')
             .then(response => response.json())
             .then(data => {
                 const blogsContainer = document.getElementById('blogs');
@@ -56,7 +40,6 @@
                         <p>Author: ${blog.author}</p>
                         <p>Created At: ${formatTime(blog.created_at)}</p>
                         <p>Updated At: ${formatTime(blog.updated_at)}</p>
-                        <button onclick="deleteBlog(${blog.id})">Delete</button>
                     `;
                     blogsContainer.appendChild(blogElement);
                 });

@@ -67,14 +67,17 @@
       });
 
       if (response.ok) {
-        // Redirect to the view page or perform any other necessary action
-        alert('Blog created successfully!');
-      } else {
-        // Handle the error case
-        alert('Error creating the blog.');
-      }
-    });
-  </script>
+      const data = await response.json(); // Parse the JSON response
+
+      // Redirect to the view page or perform any other necessary action
+      alert('Blog created successfully!');
+      window.location.href = `/blogs/${data.blogID}`;
+    } else {
+      // Handle the error case
+      alert('Error creating the blog.');
+    }
+  });
+</script>
 </body>
 
 </html>

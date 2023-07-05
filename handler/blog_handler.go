@@ -3,7 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -35,6 +37,8 @@ func GetAllBlogs(c *fiber.Ctx) error {
 		if userID.Valid {
 			blog.UserID = int(userID.Int64)
 		}
+		blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
+		blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
 		blogs = append(blogs, blog)
 	}
 
@@ -75,9 +79,13 @@ func CreateBlog(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	return c.JSON(blog)
-}
+	// Create a response map with the blogID
+	response := map[string]interface{}{
+		"blogID": blog.ID,
+	}
 
+	return c.JSON(response)
+}
 
 
 // getUserDetails retrieves the concatenated first name and last name of the logged-in user
@@ -167,6 +175,45 @@ func getUserID(c *fiber.Ctx) (int, error) {
 	return userID, nil
 }
 
+func GetBlogForEdit(c *fiber.Ctx) error {
+	// Retrieve the logged-in user's ID
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Extract the blog ID from the request parameters
+	idStr := c.Params("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Fetch the blog from the database using the blog ID and the logged-in user's ID
+	blog, err := getBlogByIDAndUserID(id, userID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.JSON(blog)
+}
+
+func GetBlogsForEdit(c *fiber.Ctx) error {
+	// Retrieve the logged-in user's ID
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Retrieve the user's blogs from the database using the user's ID
+	blogs, err := GetUserBlogs(userID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.JSON(blogs)
+}
+
 func UpdateBlog(c *fiber.Ctx) error {
 	// Retrieve the logged-in user's ID
 	userID, err := getUserID(c)
@@ -205,7 +252,7 @@ func UpdateBlog(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	return c.JSON(existingBlog)
+	return c.SendString("Blog updated successfully")
 }
 
 func getBlogByIDAndUserID(id, userID int) (models.Blog, error) {
@@ -228,7 +275,7 @@ func getBlogByIDAndUserID(id, userID int) (models.Blog, error) {
 
 func GetUserBlogs(userID int) ([]models.Blog, error) {
 	// Fetch the user's blogs from the database using the user's ID
-	query := "SELECT id, title, content FROM blogs WHERE user_id = $1"
+	query := "SELECT id, title, content, author, created_at, updated_at FROM blogs WHERE user_id = $1"
 	rows, err := database.DB.Query(query, userID)
 	if err != nil {
 		return nil, err
@@ -238,83 +285,16 @@ func GetUserBlogs(userID int) ([]models.Blog, error) {
 	var blogs []models.Blog
 	for rows.Next() {
 		var blog models.Blog
-		err := rows.Scan(&blog.ID, &blog.Title, &blog.Content)
+		err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
+		blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
+		blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
 		blogs = append(blogs, blog)
 	}
 
-
 	return blogs, nil
-}
-
-func GetBlogForEdit(c *fiber.Ctx) error {
-	// Retrieve the logged-in user's ID
-	userID, err := getUserID(c)
-	if err != nil {
-		return c.Status(http.StatusUnauthorized).SendString(err.Error())
-	}
-
-	// Extract the blog ID from the request parameters
-	idStr := c.Params("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return c.Status(http.StatusBadRequest).SendString(err.Error())
-	}
-
-	// Fetch the blog from the database using the blog ID and the logged-in user's ID
-	blog, err := getBlogByIDAndUserID(id, userID)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	// Retrieve the user's blogs from the database using the user's ID
-	blogs, err := GetUserBlogs(userID)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	// Pass both the blog and blogs data to the template for rendering
-	data := struct {
-		Blog  models.Blog
-		Blogs []models.Blog
-	}{
-		Blog:  blog,
-		Blogs: blogs,
-	}
-
-	// Render the edit.html page with the data
-	return c.Render("public/edit.html", data)
-}
-
-func GetBlogsForEdit(c *fiber.Ctx) error {
-	// Retrieve the logged-in user's ID
-	userID, err := getUserID(c)
-	if err != nil {
-		return c.Status(http.StatusUnauthorized).SendString(err.Error())
-	}
-
-	// Retrieve the user's blogs from the database using the user's ID
-	blogs, err := GetUserBlogs(userID)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
-	}
-
-	// Create a data structure to hold the blog IDs
-	data := struct {
-		BlogIDs []int
-	}{
-		BlogIDs: make([]int, len(blogs)),
-	}
-
-	// Extract the blog IDs from the retrieved blogs
-	for i, blog := range blogs {
-		data.BlogIDs[i] = blog.ID
-	}
-
-	// Render the editblogs.html page with the data
-	return c.Render("public/editblogs.html", data)
 }
 
 func GetBlogsForDelete(c *fiber.Ctx) error {
@@ -330,20 +310,8 @@ func GetBlogsForDelete(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Create a data structure to hold the blog IDs
-	data := struct {
-		BlogIDs []int
-	}{
-		BlogIDs: make([]int, len(blogs)),
-	}
-
-	// Extract the blog IDs from the retrieved blogs
-	for i, blog := range blogs {
-		data.BlogIDs[i] = blog.ID
-	}
-	
-	// Render the deleteblogs.html page with the blogs data
-	return c.Render("public/deleteblogs.html", data)
+	// Return the blogs data as JSON
+	return c.JSON(blogs)
 }
 
 func DeleteBlog(c *fiber.Ctx) error {
@@ -388,12 +356,9 @@ func GetUserBlogsByUserID(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Render the blogs template with the retrieved blogs data and return the result
-	return c.Render("public/blogs.html", fiber.Map{
-		"blogs": blogs,
-	})
+	// Return the blogs data as JSON
+	return c.JSON(blogs)
 }
-
 
 func ViewBlog(c *fiber.Ctx) error {
 	blogID := c.Params("id")
@@ -401,28 +366,29 @@ func ViewBlog(c *fiber.Ctx) error {
 	blog, err := GetBlogByID(blogID)
 	if err != nil {
 		// Handle the error, such as returning an error response or redirecting to an error page
-		return err
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Blog not found",
+		})
 	}
 
-	// Render the blog template with the retrieved blog data and return the result
-	return c.Render("public/blogpage.html", fiber.Map{
-		"blog": blog,
-	})
+	// Redirect the user to the blogpage.html with the blog data as query parameters
+	redirectURL := fmt.Sprintf("/blogpage.html?blogID=%s&title=%s&content=%s&author=%s&createdAt=%s&updatedAt=%s",
+		blogID, url.QueryEscape(blog.Title), url.QueryEscape(blog.Content),
+		url.QueryEscape(blog.Author), blog.CreatedAt.Format(time.RFC3339), blog.UpdatedAt.Format(time.RFC3339))
+	return c.Redirect(redirectURL)
 }
-
-
 
 
 func GetBlogByID(blogID string) (*models.Blog, error) {
 	// Perform a database query to fetch the blog by its ID
-	query := "SELECT id, title, content FROM blogs WHERE id = $1"
+	query := "SELECT id, title, content, author, created_at, updated_at FROM blogs WHERE id = $1"
 	row := database.DB.QueryRow(query, blogID)
 
 	// Create a new Blog struct to hold the retrieved blog data
 	blog := &models.Blog{}
 
 	// Scan the row's values into the blog struct
-	err := row.Scan(&blog.ID, &blog.Title, &blog.Content)
+	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where the blog doesn't exist

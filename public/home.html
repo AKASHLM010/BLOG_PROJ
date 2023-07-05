@@ -84,6 +84,12 @@
 
 
   <script>
+    // Helper function to format time as "year-month-day, time"
+    function formatTime(timeString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        return new Date(timeString).toLocaleString(undefined, options);
+    }
+    
     // Fetch blog data from the backend and populate the blog-list section
     fetch("/blogs")
       .then(response => response.json())
@@ -96,8 +102,8 @@
           <h2><a href="/blogs/${blog.id}">${blog.title}</a></h2>
           
             <p>Author: ${blog.author}</p>
-            <p>Created At: ${blog.created_at}</p>
-            <p>Updated At: ${blog.updated_at}</p>
+            <p>Created At: ${formatTime(blog.created_at)}</p>
+                    <p>Updated At: ${formatTime(blog.updated_at)}</p>
           `;
           blogList.appendChild(blogItem);
         });
