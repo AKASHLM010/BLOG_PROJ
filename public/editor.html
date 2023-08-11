@@ -1,54 +1,390 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Blog Editor</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>BLOGS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Fira+Code:wght@700&family=Ubuntu:wght@700&display=swap"
+      rel="stylesheet">
+    <!--FONT AWESOME-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+    <!--GOOGLE FONTS-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Play&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  </head>
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      background-color: #30323e;
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 80px), url(blog-bg.png);
+      background-size: 100vw;
+      background-position: top center, top -90px right -5vw;
+      background-repeat: no-repeat;
+      background-attachment: scroll, fixed;
+
     }
 
-    h2 {
-      color: #333;
+    /* Customize scrollbar */
+    body::-webkit-scrollbar {
+      width: 6px;
+      /* Adjust the width as needed */
     }
 
-    label {
-      font-weight: bold;
+    body::-webkit-scrollbar-track {
+      background: transparent;
     }
 
-    input,
-    textarea {
-      width: 100%;
+    body::-webkit-scrollbar-thumb {
+      background: transparent;
+      /* Make the scrollbar thumb transparent */
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background: transparent;
+      /* Make the scrollbar thumb transparent on hover */
+    }
+
+    header {
+      display: block;
+    }
+
+    /* .main-header {
+      display: flex;
+
+    } */
+
+
+    ul {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  margin-left: 20px; /* Adjust the margin as needed */
+}
+
+    li {
+      display: inline;
+
+    }
+
+    ul a {
+      display: inline-block;
+      color: white;
+      opacity: 75%;
       padding: 10px;
-      margin-bottom: 10px;
+      margin-top: 12px;
+      text-decoration: none;
+      font-size: 18px;
     }
+    a:hover {
+      color: #fff;
+      opacity: 100%;
+      
+    }
+
+    .title a {
+      display: inline-block;
+      padding: 10px;
+      margin-top: 12px;
+      color: white;
+
+      font-size: 65px;
+
+      text-decoration: underline;
+      text-decoration-thickness: 5px;
+      -moz-text-decoration-color: rgba(255, 255, 255, .1);
+      text-decoration-color: rgba(255, 255, 255, .1);
+    }
+
+    .primary-blog{
+      font-weight: 700;
+    }
+
+    .logo {
+  display: flex;
+  align-items: center;
+}
+
+    
+    
+    .flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.logout {
+  margin-right: 20px;
+}
 
     button {
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
+      background: transparent;
+      height: 38px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      ;
+      width: 100px;
+      font-size: 14px;
+      color: white;
+      margin-top: 10px;
       cursor: pointer;
+      margin-right: 3px;
     }
-  </style>
-</head>
-<body>
-  <h2>Blog Editor</h2>
-  <form id="blogForm" action="/editor">
-    <div>
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" required>
-    </div>
-    <div>
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" rows="5" required></textarea>
-    </div>
-    <button type="submit">Create Blog</button>
-  </form>
 
-  <script>
-    const form = document.getElementById('blogForm');
+
+
+    button:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .footer {
+      background: #000;
+      padding: 30px 0px;
+      font-family: 'Play', sans-serif;
+      text-align: center;
+    }
+
+    .footer .row {
+      width: 100%;
+      margin: 1% 0%;
+      padding: 0.6% 0%;
+      color: gray;
+      font-size: 0.8em;
+    }
+
+    .footer .row a {
+      text-decoration: none;
+      color: gray;
+      transition: 0.5s;
+    }
+
+    .footer .row a:hover {
+      color: #fff;
+    }
+
+    .footer .row ul {
+      width: 100%;
+    }
+
+    .footer .row ul li {
+      display: inline-block;
+      margin: 0px 30px;
+    }
+
+    .footer .row a i {
+      font-size: 2em;
+      margin: 0% 1%;
+    }
+    .img {
+        padding-top: 16px;
+        margin-left: 10px;
+    }
+
+    
+    .mega-header {
+      padding: 3rem 2rem;
+      color: white;
+      margin-left: 80px;
+    }
+
+    .mega-header .subtitle {
+      max-width: 650px;
+      font-size: 20px;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+    .head {
+      font-size: 50px;
+      font-weight: 700;
+      text-shadow: 0 5px 5px rgba(0, 0, 0, 0.9);
+      font-family: 'Ubuntu', sans-serif;
+    }
+
+    /* Reset default form styles */
+form {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Style the menu container */
+.menu {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #FFDEE9;
+background-image: linear-gradient(0deg, #FFDEE9 0%, #B5FFFC 100%);
+margin-bottom: 20px;
+
+}
+
+input#title {
+    background: transparent;
+}
+
+/* Style the form header */
+h2 {
+  margin-top: 0;
+}
+
+/* Style form labels */
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Style form input and textarea */
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Style the textarea to have a transparent background */
+textarea {
+  background-color: transparent;
+}
+
+form button{
+  background: rgb(82, 76, 76);
+      height: 38px;
+      border: 2px solid azure
+      ;
+      width: 100px;
+      font-size: 14px;
+      color: white;
+      margin-top: 10px;
+      cursor: pointer;
+      margin-right: 3px;
+}
+
+form button:hover {
+      color: #fff;
+      background: rgba(56, 31, 31, 0.2);
+    }
+
+</style>
+
+<body>
+    <header class="main-header">
+        
+        <nav class="flex">
+          <div class="logo">
+            <div class="img">
+            <img src="work.png" alt="logo" width="115px">
+          </div>
+            <ul>
+                <li class="primary-blog">
+                    <a href="/">Home</a>
+                </li>
+                <li class="primary-about">
+                    <a href="/">About</a>
+                </li>
+                <li class="primary-contact">
+                    <a href="/">Contact</a>
+                </li>
+            </ul>
+          </div>
+            <div class="button-group">
+              <button class="logout" onclick="window.location.href='/profile'">Profile</button>
+              <button class="logout" onclick="window.location.href='/logout'">LOGOUT</button>
+              </div>
+        </nav>
+    </header>
+
+    <header class="mega-header">
+    
+      <h1 class="head"> Embrace the Power of Your Words</h1>
+      <div class="subtitle">
+        <p>Connect, empower, and grow through blogging.</p>
+        <p>Together, let's make a difference—one word at a time.</p>
+        
+        <p>Write a blog now and let your voice be heard!</p></div>
+    
+  </header>
+    <div class="menu">
+      <h2>Blog Editor</h2>
+      <form id="blogForm" action="/editor">
+        <div>
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" placeholder="New Post Title here.." required>
+        </div>
+
+        <div>
+          <label for="content">Content:</label>
+          <textarea id="content" name="content" rows="20" placeholder="Write Your Post Content here.." required></textarea>
+        </div>
+        <button type="button" id="boldButton">Bold</button>
+            <button type="submit">Publish</button>
+      </form>
+    </div>
+    <footer>
+        <div class="footer">
+          <div class="row">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-youtube"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+          </div>
+    
+          <div class="row">
+            <ul>
+              <li><a href="#">Contact us</a></li>
+              <li><a href="#">Our Services</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms & Conditions</a></li>
+              <li><a href="#">Career</a></li>
+            </ul>
+          </div>
+    
+          <div class="row">
+            Copyright © 2023 - All rights reserved || Designed By: AKASH GUPTA
+          </div>
+        </div>
+      </footer>
+
+      <script>
+        
+
+        const form = document.getElementById('blogForm');
+  const boldButton = document.getElementById('boldButton');
+  const contentTextarea = document.getElementById('content');
+
+  boldButton.addEventListener('click', () => {
+    // Get the selected text
+    const selectedText = contentTextarea.value.substring(contentTextarea.selectionStart, contentTextarea.selectionEnd);
+
+    // Wrap the selected text with <strong> tags to make it bold
+    const boldText = `<strong>${selectedText}</strong>`;
+
+    // Replace the selected text with the bold version
+    const modifiedContent = contentTextarea.value.substring(0, contentTextarea.selectionStart) +
+      boldText +
+      contentTextarea.value.substring(contentTextarea.selectionEnd, contentTextarea.value.length);
+
+    // Set the modified content back to the textarea
+    contentTextarea.value = modifiedContent;
+  });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -71,13 +407,27 @@
 
       // Redirect to the view page or perform any other necessary action
       alert('Blog created successfully!');
-      window.location.href = `/blogs/${data.blogID}`;
+      window.location.href = `/blogpage.html?id=${data.blogID}`;
     } else {
       // Handle the error case
       alert('Error creating the blog.');
     }
   });
-</script>
+    </script>
 </body>
-
 </html>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+

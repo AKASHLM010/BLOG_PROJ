@@ -4,112 +4,654 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog Website</title>
-  <style>
-    /* Global Styles */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
 
-    /* Header Styles */
-    header {
-      background-color: #333;
-      color: #fff;
-      padding: 10px;
-    }
+  <title>BLOGS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Fira+Code:wght@700&family=Ubuntu:wght@700&display=swap"
+    rel="stylesheet">
+  <!--FONT AWESOME-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    nav ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    nav ul li {
-      margin-left: 10px;
-    }
-
-    nav ul li a {
-      color: #fff;
-      text-decoration: none;
-    }
-
-    /* Main Styles */
-    main {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-
-    #blog-list {
-      margin-top: 20px;
-    }
-
-    .blog-item {
-      background-color: #f4f4f4;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 5px;
-    }
-
-    .blog-item h2 {
-      margin-top: 0;
-    }
-
-    .blog-item p {
-      margin-bottom: 5px;
-    }
-  </style>
+  <!--GOOGLE FONTS-->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Play&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <header>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      background-color: #30323e;
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 80px), url(blog-bg.png);
+      background-size: 100vw;
+      background-position: top center, top -90px right -5vw;
+      background-repeat: no-repeat;
+      background-attachment: scroll, fixed;
+
+    }
+
+    /* Customize scrollbar */
+    body::-webkit-scrollbar {
+      width: 6px;
+      /* Adjust the width as needed */
+    }
+
+    body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: transparent;
+      /* Make the scrollbar thumb transparent */
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background: transparent;
+      /* Make the scrollbar thumb transparent on hover */
+    }
+
+    header {
+      display: block;
+    }
+
+    .main-header {
+      display: flex;
+
+    }
+
+    nav {
+      display: flex;
+
+    }
+
+    ul {
+      list-style-type: none;
+
+    }
+
+    li {
+      display: inline;
+
+    }
+
+    ul a {
+      display: inline-block;
+      color: white;
+      opacity: 75%;
+      padding: 10px;
+      margin-top: 12px;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    a:hover {
+      color: #fff;
+      opacity: 100%;
+      
+    }
+
+    .title a {
+      display: inline-block;
+      padding: 10px;
+      margin-top: 12px;
+      color: white;
+
+      font-size: 65px;
+
+      text-decoration: underline;
+      text-decoration-thickness: 5px;
+      -moz-text-decoration-color: rgba(255, 255, 255, .1);
+      text-decoration-color: rgba(255, 255, 255, .1);
+    }
+
+    .logo {
+      width: 220px;
+      padding: 15px;
+      margin-left: 10px;
+    }
+
+    .mega-header {
+      padding: 3rem 2rem;
+      color: white;
+      margin-left: 80px;
+    }
+
+    .mega-header .subtitle {
+      max-width: 650px;
+      font-size: 20px;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+    .head {
+      font-size: 74px;
+      font-weight: 700;
+      text-shadow: 0 5px 5px rgba(0, 0, 0, 0.9);
+      font-family: 'Ubuntu', sans-serif;
+    }
+
+    .primary-blog{
+      font-weight: 700;
+    }
+    .primary-contact {
+      padding-right: 820px;
+    }
+
+    .login {
+      margin-right: 10px;
+    }
+
+    button {
+      background: transparent;
+      height: 38px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      ;
+      width: 100px;
+      font-size: 14px;
+      color: white;
+      margin-top: 10px;
+      cursor: pointer;
+      margin-right: 3px;
+    }
+
+   
+
+
+    button:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+
+
+    .width-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .article-card {
+      margin: 0 auto 2rem;
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr 250px;
+    }
+
+    .article-card .upper {
+      background: #434858;
+      -webkit-box-shadow: 0 0 2rem rgba(19, 20, 23, .5);
+      box-shadow: 0 0 2rem rgba(19, 20, 23, .5);
+      padding: 3rem;
+      border-radius: 12px;
+    }
+
+    .category,
+    .block-time {
+      display: block;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .1rem;
+      margin: 0 0 0.25rem;
+      color: aquamarine;
+    }
+
+    .title {
+      font-family: 'Ubuntu', sans-serif;
+    }
+
+    p {
+      max-width: 600px;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      color: white;
+      font-size: 22px;
+      padding-top: 10px;
+    }
+
+    .button-group {
+      margin-left: 395px;
+    }
+
+    .button {
+      font-family: inherit;
+      display: inline-block;
+      border: 0;
+      outline: 0;
+      padding: 10px 20px 12px;
+      line-height: 1.4;
+      background: #1e1f26;
+      color: #fff;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      font-weight: 400;
+      -webkit-transition: all .2s ease;
+      transition: all .2s ease;
+      cursor: pointer;
+      margin-top: 50px;
+    }
+
+    .button:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    
+
+    .button1 {
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      display: inline-block;
+      border: 0;
+      outline: 0;
+      padding: 14px 20px 12px;
+      line-height: 1.4;
+      background: #1e1f26;
+      color: #fff;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      font-weight: 400;
+      -webkit-transition: all .2s ease;
+      transition: all .2s ease;
+      cursor: pointer;
+      margin-bottom: 40px;
+    }
+
+    .button1:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer {
+      background: #000;
+      padding: 30px 0px;
+      font-family: 'Play', sans-serif;
+      text-align: center;
+    }
+
+    .footer .row {
+      width: 100%;
+      margin: 1% 0%;
+      padding: 0.6% 0%;
+      color: gray;
+      font-size: 0.8em;
+    }
+
+    .footer .row a {
+      text-decoration: none;
+      color: gray;
+      transition: 0.5s;
+    }
+
+    .footer .row a:hover {
+      color: #fff;
+    }
+
+    .footer .row ul {
+      width: 100%;
+    }
+
+    .footer .row ul li {
+      display: inline-block;
+      margin: 0px 30px;
+    }
+
+    .footer .row a i {
+      font-size: 2em;
+      margin: 0% 1%;
+    }
+
+    
+    .article-card p {
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      /* Number of lines to show */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .search-bar {
+  display: flex;
+  margin: 10px;
+    border-radius: 4px;
+}
+
+#search-input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+}
+
+
+
+/* Optional: Add media query to adjust search bar on smaller screens */
+@media (max-width: 768px) {
+  .search-bar {
+    flex-direction: column;
+  }
+  
+  #search-input {
+    margin-bottom: 10px;
+  }
+  
+}
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .search-input-container {
+    position: relative;
+    flex: 1;
+    
+  }
+
+  #search-input {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    background: rgba(255,255,255,.1);
+    width: 98%;
+  }
+
+
+  .clear-button {
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    display: none;
+  }
+
+  /* Show the clear button when there's input in the search field */
+  .search-input-container input:not(:placeholder-shown) ~ .clear-button {
+    display: inline;
+  }
+
+
+  .fa{
+    color: white;
+  }
+ 
+
+  </style>
+  <header class="main-header">
+    <div class="logo">
+      <a href="/">
+      <img src="work.png" alt="logo" width="115px" >
+      </a>
+    </div>
     <nav>
       <ul>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/register">Register</a></li>
+        <li class="primary-blog">
+          <a href="/">Home</a>
+        </li>
+        <li class="primary-about">
+          <a href="/">About</a>
+        </li>
+        <li class="primary-contact">
+          <a href="/">Contact</a>
+        </li>
       </ul>
+      <div class="button-group">
+        <button class="login" onclick="window.location.href='/login'">LOGIN</button>
+        <button id="profileButton" style="display: none;margin-left: 110px;" onclick="window.location.href='/profile'">Profile</button>
+        <button class="signup" onclick="window.location.href='/register'">SIGNUP</button>
+      </div>
     </nav>
   </header>
 
-  <main>
-    <section id="blog-list">
-      <!-- This section will be dynamically populated with blog posts -->
-    </section>
-  </main>
+  <!-- Add the clear button inside the search bar -->
+  <div class="search-bar">
+    <div class="search-input-container">
+      <input type="text" id="search-input" placeholder="Search blogs...">
+      <span id="clear-button" class="clear-button">&#10006;</span>
+    </div>
+  </div>
+  <header class="mega-header">
+    
+      <h1 class="head">devOP Blogs</h1>
+      <div class="subtitle">This is where we post announcements, tips and tricks, new and updated features, fun
+        roundups, new podcast episodes, and more. There's an feed.</div>
+    
+  </header>
+  <div class="page-wrap">
+    <div class="width-wrapper">
+      <main>
+        
+        
+        
 
+        <section id="blog-list">
+          <!-- Dynamically generated article cards will be appended here -->
+        </section>
+      </main>
+
+      <div class="pagination">
+        <div class="older-posts">
+          <a href="#" class="button1">VIEW MORE</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer">
+      <div class="row">
+        <a href="#"><i class="fa fa-facebook"></i></a>
+        <a href="#"><i class="fa fa-instagram"></i></a>
+        <a href="#"><i class="fa fa-youtube"></i></a>
+        <a href="#"><i class="fa fa-twitter"></i></a>
+      </div>
+
+      <div class="row">
+        <ul>
+          <li><a href="#">Contact us</a></li>
+          <li><a href="#">Our Services</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Career</a></li>
+        </ul>
+      </div>
+
+      <div class="row">
+        Copyright © 2023 - All rights reserved || Designed By: AKASH GUPTA
+      </div>
+    </div>
+  </footer>
 
 
   <script>
-    // Helper function to format time as "year-month-day, time"
-    function formatTime(timeString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+    document.addEventListener("DOMContentLoaded", function () {
+      // Helper function to format time as "year-month-day, time"
+      function formatTime(timeString) {
+        const options = {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        };
         return new Date(timeString).toLocaleString(undefined, options);
-    }
-    
-    // Fetch blog data from the backend and populate the blog-list section
-    fetch("/blogs")
-      .then(response => response.json())
-      .then(data => {
+      }
+
+      // Variable to store the original blog data
+      let originalBlogs = [];
+
+      // Function to display blogs based on the data provided
+      function displayBlogs(blogs) {
         const blogList = document.getElementById("blog-list");
-        data.forEach(blog => {
-          const blogItem = document.createElement("div");
-          blogItem.className = "blog-item";
-          blogItem.innerHTML = `
-          <h2><a href="/blogs/${blog.id}">${blog.title}</a></h2>
-          
-            <p>Author: ${blog.author}</p>
-            <p>Created At: ${formatTime(blog.created_at)}</p>
-                    <p>Updated At: ${formatTime(blog.updated_at)}</p>
+        blogList.innerHTML = ""; // Clear the existing blogs
+
+        blogs.forEach(blog => {
+          const articleCard = document.createElement("article");
+          articleCard.className = "article-card";
+          articleCard.innerHTML = `
+            <div class="upper">
+              <div class="category">
+                ${blog.author}
+              </div>
+              <h1 class="title"><a href="/blogpage.html?id=${blog.id}">${blog.title}</a></h1>
+              <div class="article-text">
+                <p class="content">${blog.content}</p>
+              </div>
+              <a href="/blogpage.html?id=${blog.id}" class="button">Read More</a>
+            </div>
+            <div class="meta">
+              <time class="block-time">${formatTime(blog.created_at)}</time>
+              <div class="author">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              </div>
+            </div>
           `;
-          blogList.appendChild(blogItem);
+          blogList.appendChild(articleCard);
         });
-      })
-      .catch(error => console.error(error));
+      }
+
+      // Function to load additional blogs
+      function loadMoreBlogs() {
+        const paginationButton = document.querySelector(".older-posts .button1");
+        paginationButton.disabled = true;
+        paginationButton.textContent = "Loading...";
+
+        // Simulating an asynchronous API call to fetch more blogs
+        setTimeout(() => {
+          fetch("/blogs")
+            .then(response => response.json())
+            .then(data => {
+              const initialBlogs = data.slice(0, 10); // Display only the first 10 blogs
+              originalBlogs = [...originalBlogs, ...initialBlogs]; // Add new blogs to the original data
+              displayBlogs(originalBlogs);
+
+              // Enable the pagination button and update its text
+              paginationButton.disabled = false;
+              paginationButton.textContent = "VIEW MORE";
+            })
+            .catch(error => console.error(error));
+        }, 1000); // Simulating a delay of 1 second for demonstration purposes
+      }
+
+      // Fetch initial blog data and populate the blog-list section
+      fetch("/blogs")
+        .then(response => response.json())
+        .then(data => {
+          originalBlogs = data; // Store the original blog data
+          const initialBlogs = data.slice(0, 10); // Display only the first 10 blogs
+          displayBlogs(initialBlogs);
+        })
+        .catch(error => console.error(error));
+
+      // Add event listener to the "VIEW MORE" button
+      const paginationButton = document.querySelector(".older-posts .button1");
+      paginationButton.addEventListener("click", loadMoreBlogs);
+
+      let isSearching = false; // Flag to track if the user is searching
+
+      function handleSearch() {
+        const searchInput = document.getElementById("search-input").value.trim();
+        if (searchInput === "") {
+          // If search input is empty, show all blogs and reset the search state
+          isSearching = false;
+          displayBlogs(originalBlogs);
+          return;
+        }
+
+        // Perform the search by filtering the original blog data
+        const filteredBlogs = originalBlogs.filter(blog => {
+          // Customize the condition based on the properties you want to search (e.g., title, content, etc.)
+          return (
+            blog.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+            blog.content.toLowerCase().includes(searchInput.toLowerCase())
+          );
+        });
+
+        // Display the search results
+        isSearching = true;
+        displayBlogs(filteredBlogs);
+      }
+
+      // Clear search input when the clear button is clicked
+      const clearButton = document.getElementById("clear-button");
+      clearButton.addEventListener("click", function () {
+        const searchInput = document.getElementById("search-input");
+        searchInput.value = "";
+        // If the user clears the search input, show all blogs
+        isSearching = false;
+        displayBlogs(originalBlogs);
+      });
+
+      // Function to handle search when Enter key is pressed
+      function handleEnterKey(event) {
+        if (event.keyCode === 13) { // Check if Enter key is pressed (key code 13)
+          handleSearch();
+        }
+      }
+
+      // Add event listener for Enter key press on the search input field
+      const searchInput = document.getElementById("search-input");
+      searchInput.addEventListener("keypress", handleEnterKey);
+
+      searchInput.addEventListener('focus', function () {
+        searchInput.style.background = 'white';
+      });
+
+      searchInput.addEventListener('blur', function () {
+        searchInput.style.background = 'rgba(255, 255, 255, .1)';
+      });
+
+      function checkAuthentication() {
+        fetch("/check-authentication")
+          .then(response => response.json())
+          .then(data => {
+            const profileButton = document.getElementById("profileButton");
+            const loginButton = document.querySelector(".login");
+            const signupButton = document.querySelector(".signup");
+
+            if (data.isAuthenticated) {
+              // User is authenticated, show the profile button and hide login/signup buttons
+              profileButton.style.display = "inline";
+              loginButton.style.display = "none";
+              signupButton.style.display = "none";
+            } else {
+              // User is not authenticated, show login/signup buttons and hide the profile button
+              profileButton.style.display = "none";
+              loginButton.style.display = "inline";
+              signupButton.style.display = "inline";
+            }
+          })
+          .catch(error => console.error(error));
+      }
+
+      // Call the function to check authentication status when the DOM is loaded
+      checkAuthentication();
+
+    });
   </script>
+
+
+  
 </body>
 
 </html>

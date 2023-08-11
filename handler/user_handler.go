@@ -98,6 +98,14 @@ func AuthenticateUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"token": tokenString})
 }
 
+func Logout(c *fiber.Ctx) error {
+    // Clear the JWT token cookie
+    c.ClearCookie("jwt")
+
+    // Redirect the user to the login page or any other desired page
+    return c.Redirect("/login")
+}
+
 func UserProfile(c *fiber.Ctx) error {
 	// Get the JWT token from the cookie
 	cookie := c.Cookies("jwt")
@@ -156,4 +164,30 @@ func UserProfile(c *fiber.Ctx) error {
 
 	// Render the profile.html template with the data
 	return c.Render("public/profile.html", data)
+}
+
+func CheckAuthentication(c *fiber.Ctx) error {
+	// Get the JWT token from the request cookie
+	cookie := c.Cookies("jwt")
+	if cookie == "" {
+		// No JWT token found, user is not authenticated
+		return c.JSON(fiber.Map{"isAuthenticated": false})
+	}
+
+	token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
+		// Provide the same signing key used in the AuthenticateUser function
+		return []byte(config.SecretKey), nil
+	})
+	if err != nil {
+		// Invalid token or token verification failed, user is not authenticated
+		return c.JSON(fiber.Map{"isAuthenticated": false})
+	}
+
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// Token is valid, user is authenticated
+		return c.JSON(fiber.Map{"isAuthenticated": true})
+	}
+
+	// Token verification failed, user is not authenticated
+	return c.JSON(fiber.Map{"isAuthenticated": false})
 }

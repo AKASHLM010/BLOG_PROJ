@@ -35,11 +35,12 @@ func main() {
 	app.Get("/login", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/login.html")
 	})
+	app.Get("/logout", handler.Logout)
+
 	app.Get("/profile", handler.UserProfile)
 
 	app.Get("/blogs", handler.GetAllBlogs)
 	app.Get("/view", handler.GetUserBlogsByUserID)
-
 
 	
 	app.Post("/editor", handler.CreateBlog)
@@ -49,13 +50,13 @@ func main() {
 
 	app.Get("/edit/:id", handler.GetBlogForEdit)
 
-	app.Put("/edit/:id", handler.UpdateBlog)
+	app.Patch("/edit/:id", handler.UpdateBlog)
 	app.Get("/delete", handler.GetBlogsForDelete)
     app.Post("/delete/:id", handler.DeleteBlog)
+    app.Get("/check-authentication", handler.CheckAuthentication)
 
 
-
-
+	
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Server is running")
 	})

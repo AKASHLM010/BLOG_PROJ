@@ -1,77 +1,344 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Blog Page</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-        }
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOG PAGE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Fira+Code:wght@700&family=Ubuntu:wght@700&display=swap"
+        rel="stylesheet">
+    <!--FONT AWESOME-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-        h1 {
-            margin-top: 30px;
-            margin-bottom: 10px;
-        }
-
-        #blogContent {
-            margin-bottom: 20px;
-        }
-
-        p {
-            margin-bottom: 5px;
-        }
-
-        #blogAuthor {
-            font-style: italic;
-        }
-    </style>
+    <!--GOOGLE FONTS-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Play&display=swap" rel="stylesheet">
 </head>
-<body>
-    <h1 id="blogTitle"></h1>
-    <p id="blogContent"></p>
-    <p id="blogAuthor"></p>
-    <p id="blogCreatedAt"></p>
-    <p id="blogUpdatedAt"></p>
 
-    <script>
-        // Function to parse query parameters from the URL
-        function getQueryParams(url) {
-            const queryParams = {};
-            const params = new URLSearchParams(url.search);
-            for (const [key, value] of params.entries()) {
-                queryParams[key] = value;
-            }
-            return queryParams;
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .article{
+    background: #434858;
+    padding: 6rem;
+    border-radius: 12px;
+    -webkit-margin-after: 4rem;
+    margin-block-end: 4rem;
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+article {
+    display: block;
+    color: white;
+}
+
+.width-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+        body {
+            position: relative;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-color: #30323e;
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 80px), url(blog-bg.png);
+            background-size: 100vw;
+            background-position: top center, top -90px right -5vw;
+            background-repeat: no-repeat;
+            background-attachment: scroll, fixed;
+
         }
 
-        // Get the blog data from the query parameters
-        const queryParams = getQueryParams(window.location);
-        const title = decodeURIComponent(queryParams.title);
-        const content = decodeURIComponent(queryParams.content);
-        const author = decodeURIComponent(queryParams.author);
-        const createdAt = new Date(queryParams.createdAt).toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        });
-        const updatedAt = new Date(queryParams.updatedAt).toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        });
-        // Update the content of the page with the blog data
-        document.getElementById('blogTitle').innerText = title;
-        document.getElementById('blogContent').innerText = content;
-        document.getElementById('blogAuthor').innerText = 'Author: ' + author;
-        document.getElementById('blogCreatedAt').innerText = 'Created At: ' + createdAt;
-        document.getElementById('blogUpdatedAt').innerText = 'Updated At: ' + updatedAt;
-    </script>
-</body>
-</html>
+        /* Customize scrollbar */
+        body::-webkit-scrollbar {
+            width: 6px;
+            /* Adjust the width as needed */
+        }
+
+        body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: transparent;
+            /* Make the scrollbar thumb transparent */
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: transparent;
+            /* Make the scrollbar thumb transparent on hover */
+        }
+
+        header {
+            display: block;
+        }
+
+        .main-header {
+            display: flex;
+
+        }
+
+        nav {
+            display: flex;
+
+        }
+
+        ul {
+            list-style-type: none;
+
+        }
+
+        li {
+            display: inline;
+
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px;
+            margin-top: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .logo {
+            width: 220px;
+            padding: 15px;
+            margin-left: 10px;
+        }
+
+        .mega-header {
+            padding: 3rem 2rem;
+            color: white;
+            margin-left: 80px;
+        }
+
+        .mega-header .subtitle {
+            max-width: 650px;
+            font-size: 20px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .head {
+            font-size: 74px;
+            font-weight: 700;
+            text-shadow: 0 5px 5px rgba(0, 0, 0, 0.9);
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+
+        .primary-contact {
+            padding-right: 820px;
+        }
+
+        .login {
+            margin-right: 10px;
+        }
+
+       
+
+        .footer {
+      background: #000;
+      padding: 30px 0px;
+      font-family: 'Play', sans-serif;
+      text-align: center;
+    }
+
+    .footer .row {
+      width: 100%;
+      margin: 1% 0%;
+      padding: 0.6% 0%;
+      color: gray;
+      font-size: 0.8em;
+    }
+
+    .footer .row a {
+      text-decoration: none;
+      color: gray;
+      transition: 0.5s;
+    }
+
+    .footer .row a:hover {
+      color: #fff;
+    }
+
+    .footer .row ul {
+      width: 100%;
+    }
+
+    .footer .row ul li {
+      display: inline-block;
+      margin: 0px 30px;
+    }
+
+    .footer .row a i {
+      font-size: 2em;
+      margin: 0% 1%;
+    }
+
+    #blogTitle{
+    display: inline-block;
+    padding: 10px;
+    margin-top: 12px;
+    color: white;
+    font-size: 65px;
+    text-decoration: underline;
+    text-decoration-thickness: 5px;
+    -moz-text-decoration-color: rgba(255, 255, 255, .1);
+    text-decoration-color: rgba(255, 255, 255, .1);
+}
+        </style>
+</head>
+
+    <header class="main-header">
+        <div class="logo">
+            <img src="work.png" alt="logo" width="115px">
+        </div>
+        <nav>
+            <ul>
+                <li class="primary-blog">
+                    <a href="/">Home</a>
+                </li>
+                <li class="primary-about">
+                    <a href="/">About</a>
+                </li>
+                <li class="primary-contact">
+                    <a href="/">Contact</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <header class="mega-header">
+        <div class="width-wrapper">
+            <div class="block-time">
+                <a href="/">← Back to Blogs</a>
+            </div>
+            <h1 id="blogTitle"></h1>
+            <time id="blogCreatedAt"></time>
+        </div>
+    </header>
+    
+    <div class="page-wrap">
+        <div class="width-wrapper">
+            <article id="blogContent" class="article"></article>
+        </div>
+    </div>
+            <footer>
+                <div class="footer">
+                    <div class="row">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-instagram"></i></a>
+                        <a href="#"><i class="fa fa-youtube"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                    </div>
+        
+                    <div class="row">
+                        <ul>
+                            <li><a href="#">Contact us</a></li>
+                            <li><a href="#">Our Services</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms & Conditions</a></li>
+                            <li><a href="#">Career</a></li>
+                        </ul>
+                    </div>
+        
+                    <div class="row">
+                        Copyright © 2023 - All rights reserved || Designed By: AKASH GUPTA
+                    </div>
+                </div>
+            </footer>
+            
+            <script>
+
+                // Function to replace newlines with <br> tags for displaying line breaks in HTML
+        function insertLineBreaks(content) {
+            // Use regular expression to replace newlines with <br> tags
+            return content.replace(/\n/g, '<br>');
+        }
+
+                // Function to fetch the blog data using the blog ID from the backend API
+                function fetchBlogData(blogId) {
+                    return fetch(`/blogs/${blogId}`)
+                        .then(response => response.json())
+                        .catch(error => {
+                            console.error("Error fetching blog data:", error);
+                            return null;
+                        });
+                }
+        
+                // Function to parse query parameters from the URL
+                function getQueryParams(url) {
+                    const queryParams = {};
+                    const params = new URLSearchParams(url.search);
+                    for (const [key, value] of params.entries()) {
+                        queryParams[key] = value;
+                    }
+                    return queryParams;
+                }
+
+                // Function to format the date and time in a 12-hour clock with AM/PM notation and a specific time zone
+                function formatDateTime(dateTimeString) {
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true, // Use 12-hour clock with AM/PM notation
+        timeZone: 'Asia/Kolkata' // Set the time zone to IST
+    };
+    return new Date(dateTimeString).toLocaleString(undefined, options);
+}
+        
+                // Get the blog ID from the query parameters
+                const queryParams = getQueryParams(window.location);
+                const blogId = queryParams.id;
+        
+                // Fetch the blog data and update the content of the page
+                if (blogId) {
+                    fetchBlogData(blogId)
+                        .then(blogData => {
+                            if (blogData) {
+                                // Update the content of the page with the blog data
+                                document.getElementById('blogTitle').innerText = blogData.title;
+                                 document.getElementById('blogContent').innerHTML = insertLineBreaks(blogData.content);
+                                document.getElementById('blogCreatedAt').innerText = 'Created At: ' + formatDateTime(blogData.created_at);
+                            } else {
+                                // Blog data not found or an error occurred
+                                console.error("Blog data not found or an error occurred.");
+                            }
+                        });
+                } else {
+                    console.error("Blog ID not provided in the URL.");
+                }
+            </script>
+        
+        </body>
+        
+        </html>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

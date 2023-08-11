@@ -3,9 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -86,7 +84,6 @@ func CreateBlog(c *fiber.Ctx) error {
 
 	return c.JSON(response)
 }
-
 
 // getUserDetails retrieves the concatenated first name and last name of the logged-in user
 func getUserDetails(c *fiber.Ctx) (string, error) {
@@ -371,13 +368,9 @@ func ViewBlog(c *fiber.Ctx) error {
 		})
 	}
 
-	// Redirect the user to the blogpage.html with the blog data as query parameters
-	redirectURL := fmt.Sprintf("/blogpage.html?blogID=%s&title=%s&content=%s&author=%s&createdAt=%s&updatedAt=%s",
-		blogID, url.QueryEscape(blog.Title), url.QueryEscape(blog.Content),
-		url.QueryEscape(blog.Author), blog.CreatedAt.Format(time.RFC3339), blog.UpdatedAt.Format(time.RFC3339))
-	return c.Redirect(redirectURL)
+	// Return the blog data as JSON response
+	return c.JSON(blog)
 }
-
 
 func GetBlogByID(blogID string) (*models.Blog, error) {
 	// Perform a database query to fetch the blog by its ID
