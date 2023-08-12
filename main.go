@@ -16,7 +16,7 @@ func main() {
 	app := fiber.New()
 
 	app.Static("/", "./public")
-
+	app.Static("/api/uploads", "./uploads")
 	err := database.ConnectToDB()
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +43,7 @@ func main() {
 	app.Get("/view", handler.GetUserBlogsByUserID)
 
 	
-	app.Post("/editor", handler.CreateBlog)
+	app.Post("/api/create-blog-with-image", handler.CreateBlog)
 	app.Get("/edit", handler.GetBlogsForEdit)
     app.Get("/blogs/:id", handler.ViewBlog)
 	

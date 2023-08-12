@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,42 +18,69 @@ import (
 )
 
 func GetAllBlogs(c *fiber.Ctx) error {
-	rows, err := database.DB.Query("SELECT * FROM blogs ORDER BY created_at DESC")
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+    rows, err := database.DB.Query("SELECT * FROM blogs ORDER BY created_at DESC")
+    if err != nil {
+        return c.Status(http.StatusInternalServerError).SendString(err.Error())
+    }
+    defer rows.Close()
+
+    blogs := []models.Blog{}
+    for rows.Next() {
+        var blog models.Blog
+        var userID sql.NullInt64
+        var image sql.NullString
+        err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userID, &image)
+        if err != nil {
+            return c.Status(http.StatusInternalServerError).SendString(err.Error())
+        }
+
+        if userID.Valid {
+            blog.UserID = int(userID.Int64)
+        }
+        if image.Valid {
+            blog.Image = image.String
+        }
+        blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
+        blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
+        blogs = append(blogs, blog)
+    }
+
+    return c.JSON(blogs)
+}
+
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyz")
+
+func randLetter(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
 	}
-	defer rows.Close()
-
-	blogs := []models.Blog{}
-	for rows.Next() {
-		var blog models.Blog
-		var userID sql.NullInt64
-		err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userID)
-		if err != nil {
-			return c.Status(http.StatusInternalServerError).SendString(err.Error())
-		}
-
-		if userID.Valid {
-			blog.UserID = int(userID.Int64)
-		}
-		blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
-		blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
-		blogs = append(blogs, blog)
-	}
-
-	return c.JSON(blogs)
+	return string(b)
 }
 
 func CreateBlog(c *fiber.Ctx) error {
-	var blog models.Blog
-	err := json.Unmarshal(c.Body(), &blog)
+	form, err := c.MultipartForm()
 	if err != nil {
-		return c.Status(http.StatusBadRequest).SendString(err.Error())
+		return err
+	}
+
+	// Parse the title, content, and image from the form fields
+	title := form.Value["title"][0]
+	content := form.Value["content"][0]
+
+	// Handle image upload
+	files := form.File["image"]
+	fileName := ""
+
+	for _, file := range files {
+		fileName = randLetter(5) + "-" + file.Filename
+		if err := c.SaveFile(file, "./uploads/"+fileName); err != nil {
+			return err
+		}
 	}
 
 	currentTime := time.Now()
-	blog.CreatedAt = currentTime
-	blog.UpdatedAt = currentTime
 
 	// Get the logged-in user's full name
 	fullName, err := getUserDetails(c)
@@ -60,28 +88,37 @@ func CreateBlog(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnauthorized).SendString(err.Error())
 	}
 
-	// Set the author field of the blog to the user's full name
-	blog.Author = fullName
-
 	// Get the logged-in user's ID
 	userID, err := getUserID(c)
 	if err != nil {
 		return c.Status(http.StatusUnauthorized).SendString(err.Error())
 	}
 
-	blog.UserID = userID
+	// Create a new Blog instance with the parsed data
+	newBlog := models.Blog{
+		Title:     title,
+		Content:   content,
+		Author:    fullName,
+		CreatedAt: currentTime,
+		UpdatedAt: currentTime,
+		UserID:    userID,
+		Image:     "http://localhost:8000/api/uploads/" + fileName,
+	}
 
-	query := "INSERT INTO blogs (title, content, author, created_at, updated_at, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	row := database.DB.QueryRow(query, blog.Title, blog.Content, blog.Author, blog.CreatedAt, blog.UpdatedAt, blog.UserID)
-	if err := row.Scan(&blog.ID); err != nil {
+	// Store the newBlog instance in your database
+	query := "INSERT INTO blogs (title, content, author, created_at, updated_at, user_id, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
+	row := database.DB.QueryRow(query, newBlog.Title, newBlog.Content, newBlog.Author, newBlog.CreatedAt, newBlog.UpdatedAt, newBlog.UserID, newBlog.Image)
+	if err := row.Scan(&newBlog.ID); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Create a response map with the blogID
+	// Create a response map with the blogID and image URL
 	response := map[string]interface{}{
-		"blogID": blog.ID,
+		"blogID": newBlog.ID,
+		"url":    newBlog.Image,
 	}
-
+	// Print the URL to the terminal
+	fmt.Println("Blog URL:", newBlog.Image)
 	return c.JSON(response)
 }
 
@@ -257,41 +294,51 @@ func getBlogByIDAndUserID(id, userID int) (models.Blog, error) {
 	row := database.DB.QueryRow("SELECT * FROM blogs WHERE id = $1 AND user_id = $2", id, userID)
 
 	var blog models.Blog
-	var userIDNullable sql.NullInt64
-	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userIDNullable)
-	if err != nil {
-		return blog, err
-	}
+    var userIDNullable sql.NullInt64
+    var image sql.NullString
+    err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userIDNullable, &image)
+    if err != nil {
+        return blog, err
+    }
+
 
 	if userIDNullable.Valid {
 		blog.UserID = int(userIDNullable.Int64)
 	}
+    if image.Valid {
+        blog.Image = image.String
+    }
 
 	return blog, nil
 }
 
 func GetUserBlogs(userID int) ([]models.Blog, error) {
-	// Fetch the user's blogs from the database using the user's ID
-	query := "SELECT id, title, content, author, created_at, updated_at FROM blogs WHERE user_id = $1"
-	rows, err := database.DB.Query(query, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+    // Fetch the user's blogs from the database using the user's ID
+    query := "SELECT id, title, content, author, created_at, updated_at, image FROM blogs WHERE user_id = $1"
+    rows, err := database.DB.Query(query, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
 
-	var blogs []models.Blog
-	for rows.Next() {
-		var blog models.Blog
-		err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-		blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
-		blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
-		blogs = append(blogs, blog)
-	}
+    var blogs []models.Blog
+    for rows.Next() {
+        var blog models.Blog
+        var image sql.NullString
+        err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &image)
+        if err != nil {
+            return nil, err
+        }
 
-	return blogs, nil
+        if image.Valid {
+            blog.Image = image.String
+        }
+        blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
+        blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
+        blogs = append(blogs, blog)
+    }
+
+    return blogs, nil
 }
 
 func GetBlogsForDelete(c *fiber.Ctx) error {
@@ -374,14 +421,14 @@ func ViewBlog(c *fiber.Ctx) error {
 
 func GetBlogByID(blogID string) (*models.Blog, error) {
 	// Perform a database query to fetch the blog by its ID
-	query := "SELECT id, title, content, author, created_at, updated_at FROM blogs WHERE id = $1"
+	query := "SELECT id, title, content, author, created_at, updated_at, image FROM blogs WHERE id = $1"
 	row := database.DB.QueryRow(query, blogID)
 
 	// Create a new Blog struct to hold the retrieved blog data
 	blog := &models.Blog{}
 
 	// Scan the row's values into the blog struct
-	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt)
+	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &blog.Image)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Handle the case where the blog doesn't exist

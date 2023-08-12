@@ -232,6 +232,7 @@ article {
     <div class="page-wrap">
         <div class="width-wrapper">
             <article id="blogContent" class="article"></article>
+            <img id="blogImage" src="" alt="Blog Image">
         </div>
     </div>
             <footer>
@@ -314,6 +315,10 @@ article {
                                 document.getElementById('blogTitle').innerText = blogData.title;
                                  document.getElementById('blogContent').innerHTML = insertLineBreaks(blogData.content);
                                 document.getElementById('blogCreatedAt').innerText = 'Created At: ' + formatDateTime(blogData.created_at);
+                            // Set the image source
+                const blogImage = document.getElementById('blogImage');
+                blogImage.src = blogData.image;
+                blogImage.alt = 'Blog Image';
                             } else {
                                 // Blog data not found or an error occurred
                                 console.error("Blog data not found or an error occurred.");

@@ -10,4 +10,5 @@ type Blog struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	UserID    int       `json:"user_id"`
+	Image     string    `json:"image"` // New field for image URL
 }
