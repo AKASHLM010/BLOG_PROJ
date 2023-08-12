@@ -65,17 +65,18 @@ func CreateBlog(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Parse the title, content, and image from the form fields
+	// Parse the title and content from the form fields
 	title := form.Value["title"][0]
 	content := form.Value["content"][0]
 
-	// Handle image upload
-	files := form.File["image"]
-	fileName := ""
+	// Initialize fileName to an empty string
+	var fileName string
 
-	for _, file := range files {
-		fileName = randLetter(5) + "-" + file.Filename
-		if err := c.SaveFile(file, "./uploads/"+fileName); err != nil {
+	// Handle image upload if available
+	files := form.File["image"]
+	if len(files) > 0 {
+		fileName = randLetter(5) + "-" + files[0].Filename
+		if err := c.SaveFile(files[0], "./uploads/"+fileName); err != nil {
 			return err
 		}
 	}
@@ -102,7 +103,11 @@ func CreateBlog(c *fiber.Ctx) error {
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
 		UserID:    userID,
-		Image:     "http://localhost:8000/api/uploads/" + fileName,
+	}
+
+	// If fileName is not empty, set the image URL
+	if fileName != "" {
+		newBlog.Image = "http://localhost:8000/api/uploads/" + fileName
 	}
 
 	// Store the newBlog instance in your database
@@ -115,12 +120,19 @@ func CreateBlog(c *fiber.Ctx) error {
 	// Create a response map with the blogID and image URL
 	response := map[string]interface{}{
 		"blogID": newBlog.ID,
-		"url":    newBlog.Image,
 	}
+
+	// If fileName is not empty, add the image URL to the response
+	if fileName != "" {
+		response["url"] = newBlog.Image
+	}
+
 	// Print the URL to the terminal
 	fmt.Println("Blog URL:", newBlog.Image)
+
 	return c.JSON(response)
 }
+
 
 // getUserDetails retrieves the concatenated first name and last name of the logged-in user
 func getUserDetails(c *fiber.Ctx) (string, error) {

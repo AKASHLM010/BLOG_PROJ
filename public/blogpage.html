@@ -307,26 +307,33 @@ article {
                 const blogId = queryParams.id;
         
                 // Fetch the blog data and update the content of the page
-                if (blogId) {
-                    fetchBlogData(blogId)
-                        .then(blogData => {
-                            if (blogData) {
-                                // Update the content of the page with the blog data
-                                document.getElementById('blogTitle').innerText = blogData.title;
-                                 document.getElementById('blogContent').innerHTML = insertLineBreaks(blogData.content);
-                                document.getElementById('blogCreatedAt').innerText = 'Created At: ' + formatDateTime(blogData.created_at);
-                            // Set the image source
+if (blogId) {
+    fetchBlogData(blogId)
+        .then(blogData => {
+            if (blogData) {
+                // Update other parts of the page
+                document.getElementById('blogTitle').innerText = blogData.title;
+                document.getElementById('blogContent').innerHTML = insertLineBreaks(blogData.content);
+                document.getElementById('blogCreatedAt').innerText = 'Created At: ' + formatDateTime(blogData.created_at);
+
+                // Update the image only if the image URL is available and not blank
                 const blogImage = document.getElementById('blogImage');
-                blogImage.src = blogData.image;
-                blogImage.alt = 'Blog Image';
-                            } else {
-                                // Blog data not found or an error occurred
-                                console.error("Blog data not found or an error occurred.");
-                            }
-                        });
+                if (blogData.image && blogData.image.trim() !== '') {
+                    blogImage.src = blogData.image;
+                    blogImage.alt = 'Blog Image';
                 } else {
-                    console.error("Blog ID not provided in the URL.");
+                    // Hide the image element when no image URL is available or it's blank
+                    blogImage.style.display = 'none';
                 }
+            } else {
+                // Blog data not found or an error occurred
+                console.error("Blog data not found or an error occurred.");
+            }
+        });
+} else {
+    console.error("Blog ID not provided in the URL.");
+}
+
             </script>
         
         </body>
