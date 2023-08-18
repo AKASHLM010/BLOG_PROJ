@@ -54,7 +54,12 @@ func main() {
 	app.Get("/delete", handler.GetBlogsForDelete)
     app.Post("/delete/:id", handler.DeleteBlog)
     app.Get("/check-authentication", handler.CheckAuthentication)
+  
+	// Route to post a comment on a blog
+	app.Post("/api/blogs/:blog_id/comments", handler.PostComment)
 
+	// Route to get comments for a specific blog
+	app.Get("/api/blogs/:blog_id/comments", handler.GetCommentsForBlog)
 
 	
 	app.Get("/", func(c *fiber.Ctx) error {

@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"database/sql"
@@ -29,7 +30,9 @@ func GetAllBlogs(c *fiber.Ctx) error {
         var blog models.Blog
         var userID sql.NullInt64
         var image sql.NullString
-        err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userID, &image)
+        var tags sql.NullString // New field for tags
+
+        err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userID, &image, &tags)
         if err != nil {
             return c.Status(http.StatusInternalServerError).SendString(err.Error())
         }
@@ -40,14 +43,20 @@ func GetAllBlogs(c *fiber.Ctx) error {
         if image.Valid {
             blog.Image = image.String
         }
-        blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
-        blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
+        blog.CreatedAt = blog.CreatedAt.Local()
+        blog.UpdatedAt = blog.UpdatedAt.Local()
+
+        if tags.Valid {
+            // Directly store the comma-separated tag names as a string
+            blog.Tags = tags.String
+        }
+        // Print the blog data
+        fmt.Println("Blog:", blog)
         blogs = append(blogs, blog)
     }
 
     return c.JSON(blogs)
 }
-
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyz")
 
@@ -65,9 +74,11 @@ func CreateBlog(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Parse the title and content from the form fields
+	// Parse the title, content, and tags from the form fields
 	title := form.Value["title"][0]
 	content := form.Value["content"][0]
+	tags := form.Value["tags"][0] // Assuming you're sending tags as a single string
+	tagNames := strings.Split(tags, ", ")
 
 	// Initialize fileName to an empty string
 	var fileName string
@@ -103,6 +114,7 @@ func CreateBlog(c *fiber.Ctx) error {
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
 		UserID:    userID,
+		Tags:      strings.Join(tagNames, ", "), // Join tag names into a comma-separated string
 	}
 
 	// If fileName is not empty, set the image URL
@@ -111,8 +123,8 @@ func CreateBlog(c *fiber.Ctx) error {
 	}
 
 	// Store the newBlog instance in your database
-	query := "INSERT INTO blogs (title, content, author, created_at, updated_at, user_id, image) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
-	row := database.DB.QueryRow(query, newBlog.Title, newBlog.Content, newBlog.Author, newBlog.CreatedAt, newBlog.UpdatedAt, newBlog.UserID, newBlog.Image)
+	query := "INSERT INTO blogs (title, content, author, created_at, updated_at, user_id, image, tags) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
+	row := database.DB.QueryRow(query, newBlog.Title, newBlog.Content, newBlog.Author, newBlog.CreatedAt, newBlog.UpdatedAt, newBlog.UserID, newBlog.Image, newBlog.Tags)
 	if err := row.Scan(&newBlog.ID); err != nil {
 		return c.Status(http.StatusInternalServerError).SendString(err.Error())
 	}
@@ -127,12 +139,14 @@ func CreateBlog(c *fiber.Ctx) error {
 		response["url"] = newBlog.Image
 	}
 
+	// Add tagNames to the response
+	response["tags"] = tagNames
+
 	// Print the URL to the terminal
 	fmt.Println("Blog URL:", newBlog.Image)
 
 	return c.JSON(response)
 }
-
 
 // getUserDetails retrieves the concatenated first name and last name of the logged-in user
 func getUserDetails(c *fiber.Ctx) (string, error) {
@@ -306,51 +320,50 @@ func getBlogByIDAndUserID(id, userID int) (models.Blog, error) {
 	row := database.DB.QueryRow("SELECT * FROM blogs WHERE id = $1 AND user_id = $2", id, userID)
 
 	var blog models.Blog
-    var userIDNullable sql.NullInt64
-    var image sql.NullString
-    err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userIDNullable, &image)
-    if err != nil {
-        return blog, err
-    }
-
+	var userIDNullable sql.NullInt64
+	var image sql.NullString
+	err := row.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &userIDNullable, &image)
+	if err != nil {
+		return blog, err
+	}
 
 	if userIDNullable.Valid {
 		blog.UserID = int(userIDNullable.Int64)
 	}
-    if image.Valid {
-        blog.Image = image.String
-    }
+	if image.Valid {
+		blog.Image = image.String
+	}
 
 	return blog, nil
 }
 
 func GetUserBlogs(userID int) ([]models.Blog, error) {
-    // Fetch the user's blogs from the database using the user's ID
-    query := "SELECT id, title, content, author, created_at, updated_at, image FROM blogs WHERE user_id = $1"
-    rows, err := database.DB.Query(query, userID)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	// Fetch the user's blogs from the database using the user's ID
+	query := "SELECT id, title, content, author, created_at, updated_at, image FROM blogs WHERE user_id = $1"
+	rows, err := database.DB.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-    var blogs []models.Blog
-    for rows.Next() {
-        var blog models.Blog
-        var image sql.NullString
-        err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &image)
-        if err != nil {
-            return nil, err
-        }
+	var blogs []models.Blog
+	for rows.Next() {
+		var blog models.Blog
+		var image sql.NullString
+		err := rows.Scan(&blog.ID, &blog.Title, &blog.Content, &blog.Author, &blog.CreatedAt, &blog.UpdatedAt, &image)
+		if err != nil {
+			return nil, err
+		}
 
-        if image.Valid {
-            blog.Image = image.String
-        }
-        blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
-        blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
-        blogs = append(blogs, blog)
-    }
+		if image.Valid {
+			blog.Image = image.String
+		}
+		blog.CreatedAt = blog.CreatedAt.Local() // Convert to local time (if needed)
+		blog.UpdatedAt = blog.UpdatedAt.Local() // Convert to local time (if needed)
+		blogs = append(blogs, blog)
+	}
 
-    return blogs, nil
+	return blogs, nil
 }
 
 func GetBlogsForDelete(c *fiber.Ctx) error {
@@ -451,4 +464,73 @@ func GetBlogByID(blogID string) (*models.Blog, error) {
 	}
 
 	return blog, nil
+}
+
+func PostComment(c *fiber.Ctx) error {
+	// Get the logged-in user's ID from the JWT token
+	userID, err := getUserID(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).SendString(err.Error())
+	}
+
+	// Extract the blog ID from the request parameters
+	blogIDStr := c.Params("blog_id")
+	blogID, err := strconv.Atoi(blogIDStr)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Parse the comment content from the request body
+	var comment models.Comment
+	err = c.BodyParser(&comment)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Create a new Comment instance
+	newComment := models.Comment{
+		BlogID:    blogID,
+		UserID:    userID,
+		Content:   comment.Content,
+		CreatedAt: time.Now(),
+	}
+
+	// Store the new comment instance in the database
+	query := "INSERT INTO comments (blog_id, user_id, content, created_at) VALUES ($1, $2, $3, $4) RETURNING id"
+	row := database.DB.QueryRow(query, newComment.BlogID, newComment.UserID, newComment.Content, newComment.CreatedAt)
+	if err := row.Scan(&newComment.ID); err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.JSON(newComment)
+}
+
+func GetCommentsForBlog(c *fiber.Ctx) error {
+	// Extract the blog ID from the request parameters
+	blogIDStr := c.Params("blog_id")
+	blogID, err := strconv.Atoi(blogIDStr)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Fetch the comments for the specified blog from the database
+	query := "SELECT id, user_id, content, created_at FROM comments WHERE blog_id = $1"
+	rows, err := database.DB.Query(query, blogID)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString(err.Error())
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the retrieved comments
+	comments := []models.Comment{}
+	for rows.Next() {
+		var comment models.Comment
+		err := rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.CreatedAt)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).SendString(err.Error())
+		}
+		comments = append(comments, comment)
+	}
+
+	return c.JSON(comments)
 }

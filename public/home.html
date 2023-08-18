@@ -394,7 +394,13 @@
   .fa{
     color: white;
   }
- 
+ /* Styles for the tags */
+.tags {
+  margin-top: 10px;
+  font-family: 'Montserrat', sans-serif;
+  color: aquamarine;
+}
+
 
   </style>
   <header class="main-header">
@@ -516,6 +522,7 @@
               <h1 class="title"><a href="/blogpage.html?id=${blog.id}">${blog.title}</a></h1>
               <div class="article-text">
                 <p class="content">${blog.content}</p>
+                <div class="tags"><strong>Tags</strong> : ${blog.tags}</div> <!-- Display tags -->
               </div>
               <a href="/blogpage.html?id=${blog.id}" class="button">Read More</a>
             </div>
@@ -557,6 +564,7 @@
       fetch("/blogs")
         .then(response => response.json())
         .then(data => {
+          console.log("Fetched data:", data); // Print the fetched data
           originalBlogs = data; // Store the original blog data
           const initialBlogs = data.slice(0, 10); // Display only the first 10 blogs
           displayBlogs(initialBlogs);
@@ -578,14 +586,12 @@
           return;
         }
 
-        // Perform the search by filtering the original blog data
         const filteredBlogs = originalBlogs.filter(blog => {
-          // Customize the condition based on the properties you want to search (e.g., title, content, etc.)
-          return (
-            blog.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-            blog.content.toLowerCase().includes(searchInput.toLowerCase())
-          );
-        });
+                return (
+                    blog.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    blog.tags.toLowerCase().includes(searchInput.toLowerCase())
+                );
+            });
 
         // Display the search results
         isSearching = true;

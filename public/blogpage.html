@@ -235,6 +235,15 @@ article {
             <img id="blogImage" src="" alt="Blog Image">
         </div>
     </div>
+    <div class="comments-section">
+        <h2>Comments</h2>
+        <div id="commentsList"></div>
+        <form id="commentForm">
+            <textarea id="commentContent" placeholder="Write a comment..." required></textarea>
+            <button type="submit">Post Comment</button>
+        </form>
+    </div>
+    
             <footer>
                 <div class="footer">
                     <div class="row">
@@ -287,6 +296,52 @@ article {
                     }
                     return queryParams;
                 }
+                // Function to fetch comments for the current blog
+function fetchComments(blogId) {
+        fetch(`/api/blogs/${blogId}/comments`)
+            .then(response => response.json())
+            .then(comments => {
+                const commentsList = document.getElementById('commentsList');
+                commentsList.innerHTML = ''; // Clear existing comments
+
+                comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+                    commentElement.innerHTML = `
+                        <div class="comment-content">${comment.content}</div>
+                        <div class="comment-author">Posted by: ${comment.user_name}</div>
+                    `;
+                    commentsList.appendChild(commentElement);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching comments:", error);
+            });
+    }
+
+     // Function to post a new comment
+     function postComment(blogId, content) {
+        fetch(`/api/blogs/${blogId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: content,
+            }),
+        })
+        .then(response => response.json())
+        .then(comment => {
+            // Clear the comment form
+            document.getElementById('commentContent').value = '';
+
+            // Fetch comments again to update the comments list
+            fetchComments(blogId);
+        })
+        .catch(error => {
+            console.error("Error posting comment:", error);
+        });
+    }
 
                 // Function to format the date and time in a 12-hour clock with AM/PM notation and a specific time zone
                 function formatDateTime(dateTimeString) {
@@ -325,16 +380,43 @@ if (blogId) {
                     // Hide the image element when no image URL is available or it's blank
                     blogImage.style.display = 'none';
                 }
-            } else {
-                // Blog data not found or an error occurred
-                console.error("Blog data not found or an error occurred.");
-            }
+             // Update tags if available
+    const blogTags = document.getElementById('blogTags');
+    if (blogData.tags && blogData.tags.length > 0) {
+        const tagsList = blogData.tags.map(tag => tag.name).join(', ');
+        blogTags.innerText = 'Tags: ' + tagsList;
+    } else {
+        // If no tags are available, hide the tags section
+        blogTags.style.display = 'none';
+    }
+} else {
+    // Blog data not found or an error occurred
+    console.error("Blog data not found or an error occurred.");
+}
         });
 } else {
     console.error("Blog ID not provided in the URL.");
 }
 
+
+
+    // Fetch comments for the current blog and update the comments section
+    if (blogId) {
+        fetchComments(blogId);
+    }
+
+    // Handle comment submission
+    const commentForm = document.getElementById('commentForm');
+    commentForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const commentContent = document.getElementById('commentContent').value;
+        if (commentContent.trim() !== '') {
+            postComment(blogId, commentContent);
+        }
+    });
             </script>
+
+            
         
         </body>
         

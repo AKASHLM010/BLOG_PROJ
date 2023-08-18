@@ -335,6 +335,10 @@ form button:hover {
           <textarea id="content" name="content" rows="20" placeholder="Write Your Post Content here.." required></textarea>
         </div>
         <div>
+          <label for="tags">Tags (comma-separated):</label>
+          <input type="text" id="tags" name="tags" placeholder="Tag1, Tag2, Tag3">
+        </div>
+        <div>
           <label for="image">Image:</label>
           <input type="file" id="image" name="image" accept="image/*">
         </div>
@@ -374,6 +378,7 @@ form button:hover {
   const boldButton = document.getElementById('boldButton');
   const contentTextarea = document.getElementById('content');
   const imageInput = document.getElementById('image');
+  const tagsInput = document.getElementById('tags'); // Add this line to get the tags input element
 
   boldButton.addEventListener('click', () => {
     // Get the selected text
@@ -395,6 +400,8 @@ form button:hover {
       e.preventDefault();
 
       const formData = new FormData(form);
+      // Append the tags input to the formData
+    formData.append('tags', tagsInput.value);
 
       // Perform an AJAX request or use fetch() to send the data to the server
       // Replace '/api/create-blog-with-image' with the appropriate URL for your server's combined endpoint
